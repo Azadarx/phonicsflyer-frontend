@@ -60,8 +60,8 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">Contact</h3>
             <p className="mb-4">Have questions? Reach out to us!</p>
-            <a href="mailto:phonicswithshereen@gmail.com" className="text-purple-400 hover:text-purple-300 transition-colors duration-300">
-              phonicswithshereen@gmail.com
+            <a href="mailto:inspiringshereen@gmail.com" className="text-purple-400 hover:text-purple-300 transition-colors duration-300">
+              inspiringshereen@gmail.com
             </a>
           </div>
         </div>
