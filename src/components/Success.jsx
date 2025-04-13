@@ -30,10 +30,13 @@ const Success = () => {
       navigate('/');
     }
   }, [location, navigate]);
+  const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const verifyPayment = async (paymentId) => {
     try {
-      const response = await fetch(`/api/verify-payment?payment_id=${paymentId}`);
+      const response = await fetch(`${baseURL}/api/verify-payment?payment_id=${paymentId}`);
+
+
       
       // For debugging
       console.log('Payment verification response:', response);

@@ -31,9 +31,11 @@ const RegisterForm = () => {
       setLoading(false);
       return;
     }
+    const baseURL = import.meta.env.VITE_API_BASE_URL;
 
     try {
-      const response = await axios.post('/api/register', formData);
+      const response = await axios.post(`${baseURL}/api/register`, formData);
+
 
       if (response.data.orderId) {
         const options = {
