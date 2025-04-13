@@ -7,6 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': 'https://lifecoaching-backend-1.onrender.com',
+      historyApiFallback: true,
     },
   },
 })
