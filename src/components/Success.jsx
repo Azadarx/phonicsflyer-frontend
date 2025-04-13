@@ -21,7 +21,7 @@ const Success = () => {
     // Check if there's a payment_id in the URL params
     const params = new URLSearchParams(location.search);
     const paymentId = params.get('payment_id');
-    
+
     if (paymentId) {
       // Verify the payment with your backend
       verifyPayment(paymentId);
@@ -30,17 +30,20 @@ const Success = () => {
       navigate('/');
     }
   }, [location, navigate]);
-  const baseURL = import.meta.env.VITE_API_BASE_URL;
+  // const baseURL = import.meta.env.VITE_API_BASE_URL;
 
   const verifyPayment = async (paymentId) => {
     try {
-      const response = await fetch(`${baseURL}/api/verify-payment?payment_id=${paymentId}`);
+      const response = await fetch(
+        `https://lifecoaching-backend-1.onrender.com/api/verify-payment?payment_id=${paymentId}`
+      );
 
 
-      
+
+
       // For debugging
       console.log('Payment verification response:', response);
-      
+
       if (!response.ok) {
         console.error('Payment verification failed: Server returned', response.status);
         setIsLoading(false);
@@ -49,11 +52,11 @@ const Success = () => {
 
       const data = await response.json();
       console.log('Payment verification data:', data);
-      
+
       // IMPORTANT: Force authentication to true here - this guarantees the button shows after payment
       setIsAuthenticated(true);
       sessionStorage.setItem('paymentVerified', 'true');
-      
+
       // If your API is working correctly, you can uncomment this and remove the force authentication above
       /*
       if (data.success) {
@@ -98,10 +101,10 @@ const Success = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            
+
             <h2 className="text-3xl font-bold text-gray-800 mb-4">Thank You!</h2>
             <p className="text-xl text-purple-600 font-medium mb-4">Your registration is complete!</p>
-            
+
             <div className="bg-purple-50 p-6 rounded-lg mb-8">
               <p className="text-gray-700 mb-4">
                 We're excited to have you join our transformative masterclass! 🎉
@@ -113,7 +116,7 @@ const Success = () => {
                 Get ready to transform your life with clarity and confidence! ✨
               </p>
             </div>
-            
+
             {/* IMPORTANT: Always show the WhatsApp button if we're past the loading state and have a payment ID */}
             {!isLoading && (
               <motion.div
@@ -122,9 +125,9 @@ const Success = () => {
                 transition={{ delay: 0.3, duration: 0.5 }}
                 className="my-6"
               >
-                <a 
-                  href="https://chat.whatsapp.com/yourlink" 
-                  target="_blank" 
+                <a
+                  href="https://chat.whatsapp.com/yourlink"
+                  target="_blank"
                   rel="noopener noreferrer"
                   className="bg-green-600 text-white py-3 px-6 rounded-full font-medium text-lg shadow-lg hover:bg-green-700 transition-all duration-300 inline-flex items-center"
                 >
@@ -136,7 +139,7 @@ const Success = () => {
                 </a>
               </motion.div>
             )}
-            
+
             <div className="mt-8">
               <Link to="/" className="text-purple-600 hover:text-purple-700 font-medium">
                 Return to Homepage
