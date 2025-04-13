@@ -8,13 +8,13 @@ const Coaches = () => {
       name: "Inspiring Shereen",
       title: "Life Coach",
       description: "Shaping Lives With Holistic Success",
-      image: "/api/placeholder/400/400"
+      image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80"
     },
     {
       name: "Sikander Tuteja",
       title: "Holistic Success Coach",
       description: "Expert in business growth and personal development",
-      image: "/api/placeholder/400/400"
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIDmRb_ZtzR4LA7XUB1lPRxSJG-GlSXbIgRn7dsD4iOfZ3ZrHetNpn69uB4TD2pgS2gWQ&usqp=CAU"
     }
   ];
 

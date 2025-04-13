@@ -40,7 +40,7 @@ const Hero = () => {
             transition={{ duration: 0.8 }}
             className="hidden md:block"
           >
-            <img src="/api/placeholder/600/400" alt="Life Coaching Session" className="rounded-lg shadow-2xl" />
+            <img src="https://sdmntprsouthcentralus.oaiusercontent.com/files/00000000-6368-61f7-b4af-a0601f5fbf00/raw?se=2025-04-13T15%3A22%3A34Z&sp=r&sv=2024-08-04&sr=b&scid=70fa6b36-f113-5157-a7ac-e2c2316fcefb&skoid=fa7966e7-f8ea-483c-919a-13acfd61d696&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-04-13T07%3A24%3A33Z&ske=2025-04-14T07%3A24%3A33Z&sks=b&skv=2024-08-04&sig=i7kc%2BN9fc8kqaCwB1NsYqiJXEv1dhB4k8c/nITohDKo%3D" alt="Life Coaching Session" className="rounded-lg shadow-2xl" />
           </motion.div>
         </div>
       </div>

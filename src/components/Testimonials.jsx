@@ -8,19 +8,19 @@ const Testimonials = () => {
       name: "Priya S.",
       title: "Marketing Professional",
       text: "The masterclass was eye-opening! I gained practical tools to manage my stress and improve my work-life balance. Highly recommended!",
-      image: "/api/placeholder/80/80"
+      image: "https://media.istockphoto.com/id/1987655119/photo/smiling-young-businesswoman-standing-in-the-corridor-of-an-office.jpg?s=612x612&w=0&k=20&c=5N_IVGYsXoyj-H9vEiZUCLqbmmineaemQsKt2NTXGms="
     },
     {
       name: "Rahul M.",
       title: "Entrepreneur",
       text: "Inspiring Shereen's approach to holistic success helped me identify blind spots in my business strategy. My revenue has grown 40% since applying her methods.",
-      image: "/api/placeholder/80/80"
+      image: "https://static.vecteezy.com/system/resources/previews/049/174/246/non_2x/a-smiling-young-indian-man-with-formal-shirts-outdoors-photo.jpg"
     },
     {
       name: "Aisha K.",
       title: "HR Manager",
       text: "This masterclass gave me the confidence to ask for a promotion and improve my relationships with colleagues. The ROI on this small investment was incredible!",
-      image: "/api/placeholder/80/80"
+      image: "https://www.shutterstock.com/image-photo/portrait-young-adult-indian-woman-260nw-2387090027.jpg"
     }
   ];
 
