@@ -34,9 +34,8 @@ const Success = () => {
 
   const verifyPayment = async (paymentId) => {
     try {
-      const response = await fetch(
-        `https://lifecoaching-backend-1.onrender.com/api/verify-payment?payment_id=${paymentId}`
-      );
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/verify-payment?payment_id=${paymentId}`);
+
 
 
 

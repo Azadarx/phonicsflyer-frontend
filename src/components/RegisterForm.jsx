@@ -34,10 +34,8 @@ const RegisterForm = () => {
     // const baseURL = import.meta.env.VITE_API_BASE_URL;
 
     try {
-      const response = await axios.post(
-        'https://lifecoaching-backend-1.onrender.com/api/register',
-        formData
-      );
+      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, formData);
+
       
 
 
