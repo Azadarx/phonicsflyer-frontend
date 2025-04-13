@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      '/api': 'https://lifecoaching-backend-1.onrender.com',
+      '/api': 'https://inspiringshereen-backend.onrender.com',
       historyApiFallback: true,
     },
   },
