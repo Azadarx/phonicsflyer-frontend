@@ -36,13 +36,10 @@ const RegisterForm = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, formData);
 
-
-
-
       if (response.data.orderId) {
         const options = {
-          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: 9900,
+          key: response.data.key_id, // Use the key from the server response
+          amount: response.data.amount,
           currency: "INR",
           name: "Inspiring Shereen",
           description: "Life Coaching Masterclass",
@@ -50,31 +47,18 @@ const RegisterForm = () => {
           handler: function (response) {
             window.location.href = `/success?payment_id=${response.razorpay_payment_id}`;
           },
-          prefill: {
-            name: formData.fullName,
-            email: formData.email,
-            contact: formData.phone
-          },
+          prefill: response.data.prefill, // Use the prefill from server
           theme: {
             color: "#7C3AED"
           },
-          method: {
-            upi: true,
-            card: true,
-            netbanking: true,
-            wallet: true
-          },
-          retry: {
-            enabled: true,
-            max_count: 2
-          },
+          config: response.data.config, // Use the UPI config from server
           modal: {
-            ondismiss: () => {
+            escape: false,
+            ondismiss: function () {
               alert("Payment popup closed. You can try again!");
             }
           }
         };
-
 
         const rzp = new window.Razorpay(options);
         rzp.open();
