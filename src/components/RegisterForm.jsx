@@ -36,7 +36,7 @@ const RegisterForm = () => {
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, formData);
 
-      
+
 
 
       if (response.data.orderId) {
@@ -57,8 +57,24 @@ const RegisterForm = () => {
           },
           theme: {
             color: "#7C3AED"
+          },
+          method: {
+            upi: true,
+            card: true,
+            netbanking: true,
+            wallet: true
+          },
+          retry: {
+            enabled: true,
+            max_count: 2
+          },
+          modal: {
+            ondismiss: () => {
+              alert("Payment popup closed. You can try again!");
+            }
           }
         };
+
 
         const rzp = new window.Razorpay(options);
         rzp.open();
