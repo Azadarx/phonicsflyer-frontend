@@ -12,7 +12,7 @@ const Coaches = () => {
       name: "Inspiring Shereen",
       title: "Life Coach",
       description: "Shaping Lives With Holistic Success",
-      image: "./assets/mam.jpg",
+      image: "/assets/mam.jpg",
       bio: "With over 10 years of experience in transformational coaching, Shereen has helped hundreds of professionals reclaim their purpose and passion.",
       expertise: ["Personal Development", "Life Transformation", "Mindfulness Training"]
     },
@@ -20,7 +20,7 @@ const Coaches = () => {
       name: "Sikander Tuteja",
       title: "Holistic Success Coach",
       description: "Expert in business growth and personal development",
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIDmRb_ZtzR4LA7XUB1lPRxSJG-GlSXbIgRn7dsD4iOfZ3ZrHetNpn69uB4TD2pgS2gWQ&usqp=CAU",
+      image: "/assets/sir.jpg",
       bio: "A seasoned entrepreneur and mindset coach, Sikander specializes in helping professionals align their career goals with their core values.",
       expertise: ["Business Strategy", "Wealth Creation", "Leadership Development"]
     }
