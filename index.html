@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+  <!-- Fixed Cashfree SDK inclusion with proper attributes -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Inspiring Shereen</title>
 </head>
@@ -12,6 +12,8 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+  <!-- Load Cashfree SDK here instead of in the head -->
+  <script src="https://sdk.cashfree.com/js/v3/cashfree.js" crossorigin="anonymous" id="cashfree-sdk" async></script>
 </body>
 
 </html>

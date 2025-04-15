@@ -12,35 +12,51 @@ const RegisterForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [cashfreeLoaded, setCashfreeLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // Load Cashfree SDK
+  // Load Cashfree SDK dynamically
   useEffect(() => {
-    // Check if Cashfree SDK is already loaded
-    if (!window.CashFree) {
-      const script = document.createElement("script");
-      script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-      script.crossOrigin = "anonymous";
-      script.onload = () => {
-        console.log("Cashfree SDK loaded");
-      };
-      script.onerror = () => {
-        console.error("Failed to load Cashfree SDK");
-        setError("Failed to load payment gateway");
-      };
-      document.body.appendChild(script);
-    }
-  }, []);
+    const loadCashfreeSDK = async () => {
+      // Remove any existing Cashfree script to avoid duplicates
+      const existingScript = document.querySelector('script[src*="cashfree.js"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
 
-  // Debug: Log environment variables in development
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      console.log("Environment vars:", {
-        apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
-        hasAppId: !!import.meta.env.VITE_CASHFREE_APP_ID,
+      return new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+        script.async = true;
+        script.crossOrigin = "anonymous";
+        
+        script.onload = () => {
+          console.log("Cashfree SDK loaded successfully");
+          setCashfreeLoaded(true);
+          resolve(true);
+        };
+        
+        script.onerror = (error) => {
+          console.error("Failed to load Cashfree SDK", error);
+          setError("Payment gateway failed to load. Please refresh the page.");
+          reject(error);
+        };
+        
+        document.body.appendChild(script);
       });
-      console.log("Cashfree SDK available:", !!window.CashFree);
-    }
+    };
+
+    loadCashfreeSDK().catch(err => {
+      console.error("Error in Cashfree SDK loading:", err);
+    });
+
+    // Cleanup function to remove the script when component unmounts
+    return () => {
+      const script = document.querySelector('script[src*="cashfree.js"]');
+      if (script) {
+        script.remove();
+      }
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -84,9 +100,10 @@ const RegisterForm = () => {
       // Get payment session ID and app ID from the response
       const { appId, orderToken } = orderResponse.data;
 
-      // Check if Cashfree SDK is loaded
+      // Check if Cashfree SDK is available in window
       if (!window.CashFree) {
-        throw new Error('Payment gateway not loaded. Please try again.');
+        // If SDK not loaded after waiting, throw error
+        throw new Error('Payment gateway not loaded. Please refresh and try again.');
       }
 
       // Initialize Cashfree checkout
@@ -96,6 +113,12 @@ const RegisterForm = () => {
         orderToken: orderToken,
         onSuccess: (data) => {
           console.log("Payment success:", data);
+          // Manually confirm payment with backend in case webhook fails
+          axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`, {
+            referenceId: referenceId,
+            transactionId: data.transaction_id || data.order_id
+          }).catch(err => console.error("Error confirming payment:", err));
+          
           navigate('/success');
         },
         onFailure: (data) => {
