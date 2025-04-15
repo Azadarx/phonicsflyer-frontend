@@ -12,7 +12,7 @@ const Coaches = () => {
       name: "Inspiring Shereen",
       title: "Life Coach",
       description: "Shaping Lives With Holistic Success",
-      image: "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80",
+      image: "./assets/mam.jpg",
       bio: "With over 10 years of experience in transformational coaching, Shereen has helped hundreds of professionals reclaim their purpose and passion.",
       expertise: ["Personal Development", "Life Transformation", "Mindfulness Training"]
     },
