@@ -1,5 +1,5 @@
 // src/components/RegisterForm.jsx
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -14,43 +14,40 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  // Load Cashfree SDK
+  useEffect(() => {
+    // Check if Cashfree SDK is already loaded
+    if (!window.CashFree) {
+      const script = document.createElement("script");
+      script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+      script.crossOrigin = "anonymous";
+      script.onload = () => {
+        console.log("Cashfree SDK loaded");
+      };
+      script.onerror = () => {
+        console.error("Failed to load Cashfree SDK");
+        setError("Failed to load payment gateway");
+      };
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  // Debug: Log environment variables in development
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      console.log("Environment vars:", {
+        apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
+        hasAppId: !!import.meta.env.VITE_CASHFREE_APP_ID,
+      });
+      console.log("Cashfree SDK available:", !!window.CashFree);
+    }
+  }, []);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
-  };
-
-  const initCashfree = (paymentSessionId, appId) => {
-    if (!window.CashFree) {
-      setError('Payment gateway not loaded. Please try again.');
-      setLoading(false);
-      return;
-    }
-
-    const cashfree = new window.CashFree(appId);
-    const dropConfig = {
-      components: ["order-details", "card", "upi", "netbanking", "app", "paylater"],
-      orderToken: paymentSessionId,
-      onSuccess: (data) => {
-        // On successful payment, navigate to success page
-        console.log("Payment success:", data);
-        navigate('/success');
-      },
-      onFailure: (data) => {
-        // On payment failure, show error
-        console.error("Payment failed:", data);
-        setError('Payment failed. Please try again.');
-        setLoading(false);
-      },
-      onClose: () => {
-        // When payment modal is closed
-        console.log("Payment widget closed");
-        setLoading(false);
-      },
-    };
-
-    cashfree.checkout(dropConfig);
   };
 
   const handleSubmit = async (e) => {
@@ -83,65 +80,36 @@ const RegisterForm = () => {
 
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
-      const loadCashfreeSDK = () => {
-        return new Promise((resolve, reject) => {
-          if (window.CashFree) {
-            console.log("Cashfree SDK already loaded");
-            resolve();
-            return;
-          }
-          useEffect(() => {
-            if (!window.CashFree) {
-              const script = document.createElement("script");
-              script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-              script.crossOrigin = "anonymous";
-              script.onload = () => {
-                console.log("Cashfree SDK loaded");
-              };
-              script.onerror = () => {
-                setError("Failed to load Cashfree SDK");
-              };
-              document.body.appendChild(script);
-            }
-          }, []);
-
-        });
-      };
 
       // Get payment session ID and app ID from the response
-      const { paymentSessionId, appId, orderToken } = orderResponse.data;
+      const { appId, orderToken } = orderResponse.data;
 
-      try {
-        // Load the Cashfree SDK
-        await loadCashfreeSDK();
-
-        // Initialize Cashfree
-        const cashfree = new window.CashFree(appId);
-        const dropConfig = {
-          components: ["order-details", "card", "upi", "netbanking", "app", "paylater"],
-          orderToken: orderToken || paymentSessionId, // Use orderToken if available
-          onSuccess: (data) => {
-            console.log("Payment success:", data);
-            navigate('/success');
-          },
-          onFailure: (data) => {
-            console.error("Payment failed:", data);
-            setError('Payment failed: ' + (data.message || 'Please try again'));
-            setLoading(false);
-          },
-          onClose: () => {
-            console.log("Payment widget closed");
-            setLoading(false);
-          },
-        };
-
-        cashfree.checkout(dropConfig);
-
-      } catch (sdkError) {
-        console.error("SDK Error:", sdkError);
-        setError('Failed to load payment gateway: ' + sdkError.message);
-        setLoading(false);
+      // Check if Cashfree SDK is loaded
+      if (!window.CashFree) {
+        throw new Error('Payment gateway not loaded. Please try again.');
       }
+
+      // Initialize Cashfree checkout
+      const cashfree = new window.CashFree(appId);
+      const dropConfig = {
+        components: ["order-details", "card", "upi", "netbanking", "app", "paylater"],
+        orderToken: orderToken,
+        onSuccess: (data) => {
+          console.log("Payment success:", data);
+          navigate('/success');
+        },
+        onFailure: (data) => {
+          console.error("Payment failed:", data);
+          setError('Payment failed: ' + (data.message || 'Please try again'));
+          setLoading(false);
+        },
+        onClose: () => {
+          console.log("Payment widget closed");
+          setLoading(false);
+        },
+      };
+
+      cashfree.checkout(dropConfig);
 
     } catch (err) {
       console.error('Registration/payment error:', err);
@@ -149,19 +117,6 @@ const RegisterForm = () => {
       setLoading(false);
     }
   };
-  // In your registerForm.jsx, add this before your return statement
-  useEffect(() => {
-    // Check if we're in development mode
-    if (import.meta.env.DEV) {
-      console.log("Environment vars:", {
-        apiBaseUrl: import.meta.env.VITE_API_BASE_URL,
-        hasAppId: !!import.meta.env.VITE_CASHFREE_APP_ID,
-      });
-
-      // Check if Cashfree is already available
-      console.log("Cashfree SDK available:", !!window.CashFree);
-    }
-  }, []);
 
   return (
     <section id="register" className="py-16 bg-gradient-to-br from-purple-50 to-indigo-50">
@@ -248,7 +203,7 @@ const RegisterForm = () => {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <svg className="animate-spin h-5 w-5 text-white mr-2" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                   </svg>
