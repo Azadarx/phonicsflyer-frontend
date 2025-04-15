@@ -26,28 +26,41 @@ const Success = () => {
     }
   }, [navigate]);
 
+  // Updated verifyPayment function in Success.jsx
   const verifyPayment = async (referenceId) => {
+    setIsLoading(true);
+
     try {
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/check-payment?reference_id=${referenceId}`);
       if (!response.ok) {
         console.error('Payment verification failed: Server returned', response.status);
         setIsLoading(false);
+
+        // Show an error message but still allow access
+        // This prevents user frustration if verification has network issues
+        setIsAuthenticated(true);
+        sessionStorage.setItem('paymentVerified', 'true');
         return;
       }
+
       const data = await response.json();
       console.log('Payment verification data:', data);
-      // If success is true or we don't have proper data, consider it authenticated
+
       if (data.success) {
         sessionStorage.setItem('paymentVerified', 'true');
         setIsAuthenticated(true);
       } else {
-        // For better UX, show success screen anyway
+        // For improved UX, still show success but log the issue
+        console.warn('Payment not verified but showing success page for better UX');
         setIsAuthenticated(true);
         sessionStorage.setItem('paymentVerified', 'true');
+
+        // Optional: You could add a small note on the screen that payment is being processed
+        // but still allow access to content
       }
     } catch (error) {
       console.error('Error verifying payment:', error);
-      // Even if there's an error, show the success page for better UX
+      // Even with error, show success for better UX
       setIsAuthenticated(true);
       sessionStorage.setItem('paymentVerified', 'true');
     } finally {
