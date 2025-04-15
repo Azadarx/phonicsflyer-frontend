@@ -70,19 +70,19 @@ const Navbar = () => {
             </Link>
           </motion.div>
           
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center">
             <motion.div 
               initial="hidden"
               animate="visible"
               transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
-              className="ml-10 flex items-center space-x-8"
+              className="flex items-center space-x-6"
             >
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
                 <motion.a
                   key={item}
                   variants={navItemVariants}
                   href={item === 'home' ? '/' : `#${item}`}
-                  className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                  className={`relative px-2 py-2 text-sm font-medium transition-colors duration-300 ${
                     activeSection === item
                       ? 'text-violet-600'
                       : 'text-gray-700 hover:text-violet-500'
@@ -101,24 +101,20 @@ const Navbar = () => {
                   )}
                 </motion.a>
               ))}
-              
-              <motion.div
-                variants={navItemVariants}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+            </motion.div>
+            
+            <motion.div
+              variants={navItemVariants}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="ml-8"
+            >
+              <Link 
+                to="/register" 
+                className="bg-violet-600 hover:bg-violet-700 text-white px-5 py-2 rounded-lg font-medium transition-all duration-300"
               >
-                <Link 
-                  to="/register" 
-                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-6 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-violet-200 transition-all duration-300"
-                >
-                  <span className="flex items-center">
-                    <span>Enroll Now</span>
-                    <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </span>
-                </Link>
-              </motion.div>
+                Enroll Now
+              </Link>
             </motion.div>
           </div>
           
@@ -150,7 +146,7 @@ const Navbar = () => {
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="md:hidden overflow-hidden bg-white shadow-xl"
           >
-            <div className="px-4 pt-2 pb-4 space-y-3">
+            <div className="px-4 pt-2 pb-4 space-y-1">
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
                 <motion.div
                   key={item}
@@ -160,7 +156,7 @@ const Navbar = () => {
                 >
                   <a 
                     href={item === 'home' ? '/' : `#${item}`}
-                    className={`block px-4 py-3 rounded-lg text-base font-medium ${
+                    className={`block px-4 py-2 rounded-lg text-base font-medium ${
                       activeSection === item
                         ? 'bg-violet-50 text-violet-600'
                         : 'text-gray-700 hover:bg-gray-50'
@@ -176,11 +172,11 @@ const Navbar = () => {
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-6 px-4"
+                className="pt-2 px-4"
               >
                 <Link 
                   to="/register" 
-                  className="block w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 text-center rounded-xl font-medium shadow-md"
+                  className="block w-full bg-violet-600 hover:bg-violet-700 text-white py-2 text-center rounded-lg font-medium transition-colors duration-300"
                   onClick={() => setIsOpen(false)}
                 >
                   Enroll Now
