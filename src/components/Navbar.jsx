@@ -1,11 +1,12 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -14,6 +15,18 @@ const Navbar = () => {
       } else {
         setScrolled(false);
       }
+      
+      // Active section detection
+      const sections = ['about', 'features', 'coaches', 'pricing'];
+      sections.forEach(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= 100 && rect.bottom >= 100) {
+            setActiveSection(section);
+          }
+        }
+      });
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -21,34 +34,85 @@ const Navbar = () => {
   }, []);
 
   return (
-    <nav className={`fixed w-full z-20 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <motion.nav 
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      className={`fixed w-full z-40 transition-all duration-500 backdrop-blur-lg ${
+        scrolled 
+          ? 'bg-white/90 shadow-lg py-2' 
+          : 'bg-transparent py-6'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0 text-xl md:text-2xl font-bold">
+          <motion.div 
+            className="flex-shrink-0"
+            whileHover={{ scale: 1.05 }}
+          >
             <Link to="/" className="flex items-center">
-              <span className="text-purple-600">Inspiring Shereen</span>
-              <span className="text-gray-700 ml-2">| Life Coach</span>
+              <span className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-500">
+                Inspiring Shereen
+              </span>
+              <motion.span 
+                className="hidden md:block text-gray-700 ml-2 italic"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                | Life Coach
+              </motion.span>
             </Link>
-          </div>
+          </motion.div>
+          
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-6">
-              <Link to="/" className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Home</Link>
-              <a href="#about" className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
-              <a href="#features" className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Features</a>
-              <a href="#coaches" className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Coaches</a>
-              <a href="#pricing" className="text-gray-700 hover:text-purple-600 px-3 py-2 rounded-md text-sm font-medium">Pricing</a>
-              <motion.button
+            <div className="ml-10 flex items-center space-x-8">
+              {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
+                <motion.a
+                  key={item}
+                  href={item === 'home' ? '/' : `#${item}`}
+                  className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300 ${
+                    activeSection === item
+                      ? 'text-purple-600'
+                      : 'text-gray-700 hover:text-purple-500'
+                  }`}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {item.charAt(0).toUpperCase() + item.slice(1)}
+                  {activeSection === item && (
+                    <motion.span
+                      layoutId="navUnderline"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-500"
+                      initial={{ width: 0 }}
+                      animate={{ width: '100%' }}
+                      transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                    />
+                  )}
+                </motion.a>
+              ))}
+              
+              <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-purple-600 text-white px-6 py-2 rounded-full font-medium shadow-lg hover:bg-purple-700 transition-all duration-300"
-                onClick={() => window.location.href = "/register"}
               >
-                Enroll Now
-              </motion.button>
+                <Link 
+                  to="/register" 
+                  className="bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white px-6 py-2.5 rounded-full font-medium shadow-lg hover:shadow-purple-200 transition-all duration-300"
+                >
+                  <span className="flex items-center">
+                    <span>Enroll Now</span>
+                    <svg className="w-4 h-4 ml-2" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </span>
+                </Link>
+              </motion.div>
             </div>
           </div>
+          
           <div className="md:hidden">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-purple-600 focus:outline-none"
             >
@@ -59,37 +123,62 @@ const Navbar = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="md:hidden bg-white shadow-lg"
-        >
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/" className="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">Home</Link>
-            <a href="#about" className="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">About</a>
-            <a href="#features" className="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">Features</a>
-            <a href="#coaches" className="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">Coaches</a>
-            <a href="#pricing" className="text-gray-700 hover:text-purple-600 block px-3 py-2 rounded-md text-base font-medium">Pricing</a>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="bg-purple-600 text-white w-full mt-4 px-6 py-2 rounded-full font-medium shadow-lg hover:bg-purple-700 transition-all duration-300"
-              onClick={() => window.location.href = "/register"}
-            >
-              Enroll Now
-            </motion.button>
-          </div>
-        </motion.div>
-      )}
-    </nav>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-white/95 backdrop-blur-md shadow-xl"
+          >
+            <div className="px-4 pt-2 pb-4 space-y-3">
+              {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
+                <motion.div
+                  key={item}
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 * ['home', 'about', 'features', 'coaches', 'pricing'].indexOf(item) }}
+                >
+                  <a 
+                    href={item === 'home' ? '/' : `#${item}`}
+                    className={`block px-4 py-3 rounded-lg text-base font-medium ${
+                      activeSection === item
+                        ? 'bg-purple-50 text-purple-600'
+                        : 'text-gray-700 hover:bg-gray-50'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.charAt(0).toUpperCase() + item.slice(1)}
+                  </a>
+                </motion.div>
+              ))}
+              
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.5 }}
+                className="mt-6 px-4"
+              >
+                <Link 
+                  to="/register" 
+                  className="block w-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white py-3 text-center rounded-full font-medium shadow-md"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Enroll Now
+                </Link>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 };
 
