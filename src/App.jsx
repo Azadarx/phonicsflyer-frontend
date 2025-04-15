@@ -10,7 +10,6 @@ import Pricing from './components/Pricing';
 import Footer from './components/Footer';
 import Success from './components/Success';
 import RegisterForm from './components/RegisterForm';
-import Payment from './components/Payment';
 import ContactUs from './components/ContactUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
@@ -39,7 +38,6 @@ function App() {
             <Footer />
           </>
         } />
-        <Route path="/payment" element={<Payment />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />

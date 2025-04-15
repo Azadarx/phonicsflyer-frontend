@@ -27,18 +27,52 @@ const RegisterForm = () => {
     setError('');
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, formData);
+      // Step 1: Register the user and get reference ID
+      const registerResponse = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/register`, 
+        formData
+      );
 
-      if (response.data.success) {
-        // Store reference ID in session storage for payment page
-        sessionStorage.setItem('paymentData', JSON.stringify(response.data));
-        // Navigate to payment page
-        navigate('/payment');
+      if (!registerResponse.data.success) {
+        throw new Error('Registration failed');
       }
+
+      const { referenceId } = registerResponse.data;
+      
+      // Step 2: Create payment order with Cashfree
+      const orderResponse = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
+        { referenceId }
+      );
+
+      if (!orderResponse.data.success) {
+        throw new Error('Failed to create payment order');
+      }
+
+      // Save reference ID in session storage for later use
+      sessionStorage.setItem('referenceId', referenceId);
+      
+      // Redirect to Cashfree payment page
+      // Using Cashfree's JS SDK
+      const { paymentSessionId, appId } = orderResponse.data;
+      
+      // Initialize Cashfree SDK
+      window.CashFree.initPopup({
+        appId,
+        paymentSessionId,
+        onSuccess: function(data) {
+          // Payment succeeded, navigate to success page
+          navigate('/success');
+        },
+        onFailure: function(data) {
+          console.error('Payment failed:', data);
+          setError('Your payment was not successful. Please try again.');
+          setLoading(false);
+        }
+      });
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('Registration/payment error:', err);
       setError('An error occurred during registration. Please try again.');
-    } finally {
       setLoading(false);
     }
   };

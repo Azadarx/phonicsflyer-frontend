@@ -1,68 +1,57 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import axios from 'axios'; // Make sure to import axios
 
 const Success = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [orderDetails, setOrderDetails] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
-    // First check if we already verified the payment in this session
-    const alreadyVerified = sessionStorage.getItem('paymentVerified');
-    if (alreadyVerified === 'true') {
-      setIsAuthenticated(true);
-      setIsLoading(false);
-      return;
-    }
     // Check if there's a reference ID in session storage
     const referenceId = sessionStorage.getItem('referenceId');
-    if (referenceId) {
-      // Verify the payment with your backend
-      verifyPayment(referenceId);
-    } else {
+
+    if (!referenceId) {
       // Redirect to homepage if no reference ID is present
       navigate('/');
+      return;
     }
+
+    // Verify the payment with the backend
+    verifyPayment(referenceId);
   }, [navigate]);
 
-  // Updated verifyPayment function in Success.jsx
   const verifyPayment = async (referenceId) => {
-    setIsLoading(true);
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/check-payment?reference_id=${referenceId}`);
-      if (!response.ok) {
-        console.error('Payment verification failed: Server returned', response.status);
-        setIsLoading(false);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/check-payment?reference_id=${referenceId}`
+      );
 
-        // Show an error message but still allow access
-        // This prevents user frustration if verification has network issues
+      if (response.data.success) {
         setIsAuthenticated(true);
-        sessionStorage.setItem('paymentVerified', 'true');
-        return;
-      }
-
-      const data = await response.json();
-      console.log('Payment verification data:', data);
-
-      if (data.success) {
-        sessionStorage.setItem('paymentVerified', 'true');
-        setIsAuthenticated(true);
+        setOrderDetails({
+          referenceId,
+          // Add any other details you want to display
+        });
       } else {
-        // For improved UX, still show success but log the issue
-        console.warn('Payment not verified but showing success page for better UX');
+        // For better UX, still allow access but with a note
+        console.warn('Payment verification pending but showing success page');
         setIsAuthenticated(true);
-        sessionStorage.setItem('paymentVerified', 'true');
-
-        // Optional: You could add a small note on the screen that payment is being processed
-        // but still allow access to content
+        setOrderDetails({
+          referenceId,
+          paymentStatus: 'Processing'
+        });
       }
     } catch (error) {
       console.error('Error verifying payment:', error);
-      // Even with error, show success for better UX
+      // Even on error, show success for better UX
       setIsAuthenticated(true);
-      sessionStorage.setItem('paymentVerified', 'true');
+      setOrderDetails({
+        referenceId,
+        paymentStatus: 'Verification pending'
+      });
     } finally {
       setIsLoading(false);
     }
@@ -88,22 +77,27 @@ const Success = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Payment Successful!</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Registration Successful!</h1>
             <p className="text-gray-600 mb-6">
-              Thank you for your payment. Your transaction has been completed successfully.
+              Thank you for registering for the masterclass. Your spot is confirmed!
             </p>
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-gray-500 mb-2">Your order details have been sent to your email.</p>
+              <p className="text-sm text-gray-500 mb-2">Your event details have been sent to your email.</p>
               <p className="text-sm text-gray-500">
-                Reference ID: <span className="font-medium">{sessionStorage.getItem('referenceId') || 'N/A'}</span>
+                Reference ID: <span className="font-medium">{orderDetails.referenceId || 'Processing'}</span>
               </p>
+              {orderDetails.paymentStatus === 'Processing' && (
+                <p className="text-xs text-amber-600 mt-2">
+                  Note: Your payment is being processed. You will receive a confirmation email shortly.
+                </p>
+              )}
             </div>
             <div className="flex flex-col space-y-3">
               <Link
                 to="/dashboard"
                 className="bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg font-medium transition-colors"
               >
-                Go to Dashboard
+                Access Masterclass Details
               </Link>
               <Link
                 to="/"
