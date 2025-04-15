@@ -15,8 +15,13 @@ const Success = () => {
     const referenceId = sessionStorage.getItem('referenceId');
 
     if (!referenceId) {
-      // Redirect to homepage if no reference ID is present
-      navigate('/');
+      console.warn('No reference ID found in session storage - showing success page anyway');
+      // Still show success page but with limited info
+      setIsAuthenticated(true);
+      setOrderDetails({
+        paymentStatus: 'Unknown'
+      });
+      setIsLoading(false);
       return;
     }
 
@@ -30,21 +35,11 @@ const Success = () => {
         `${import.meta.env.VITE_API_BASE_URL}/api/check-payment?reference_id=${referenceId}`
       );
 
-      if (response.data.success) {
-        setIsAuthenticated(true);
-        setOrderDetails({
-          referenceId,
-          // Add any other details you want to display
-        });
-      } else {
-        // For better UX, still allow access but with a note
-        console.warn('Payment verification pending but showing success page');
-        setIsAuthenticated(true);
-        setOrderDetails({
-          referenceId,
-          paymentStatus: 'Processing'
-        });
-      }
+      setIsAuthenticated(true);
+      setOrderDetails({
+        referenceId,
+        paymentStatus: response.data.success ? 'Confirmed' : 'Processing'
+      });
     } catch (error) {
       console.error('Error verifying payment:', error);
       // Even on error, show success for better UX
@@ -126,20 +121,20 @@ const Success = () => {
         {/* Glowing orbs */}
         <div className="absolute -top-12 -right-12 w-24 h-24 bg-pink-400 rounded-full filter blur-xl opacity-50"></div>
         <div className="absolute -bottom-8 -left-8 w-20 h-20 bg-purple-500 rounded-full filter blur-xl opacity-50"></div>
-        
+
         {isLoading ? (
-          <motion.div 
+          <motion.div
             className="flex flex-col items-center justify-center py-12"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
             <div className="relative w-20 h-20">
-              <motion.div 
+              <motion.div
                 className="absolute inset-0 rounded-full border-4 border-t-transparent border-purple-300"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
               ></motion.div>
-              <motion.div 
+              <motion.div
                 className="absolute inset-2 rounded-full border-4 border-b-transparent border-pink-400"
                 animate={{ rotate: -360 }}
                 transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -148,13 +143,13 @@ const Success = () => {
             <p className="mt-6 text-white text-lg">Verifying your payment...</p>
           </motion.div>
         ) : (
-          <motion.div 
+          <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="text-center"
           >
-            <motion.div 
+            <motion.div
               variants={itemVariants}
               className="w-28 h-28 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/30 relative"
             >
@@ -163,22 +158,22 @@ const Success = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
               </svg>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               variants={itemVariants}
               className="text-3xl font-bold text-white mb-4"
             >
               Registration Successful!
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               variants={itemVariants}
               className="text-white text-opacity-90 mb-8 text-lg"
             >
               Thank you for registering for the masterclass. Your spot is confirmed!
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               variants={itemVariants}
               className="bg-white bg-opacity-20 backdrop-blur-sm rounded-xl p-6 mb-8 border border-white border-opacity-20"
             >
@@ -197,7 +192,7 @@ const Success = () => {
                 </p>
               )}
             </motion.div>
-            
+
             <div className="flex flex-col space-y-4">
               <motion.div variants={itemVariants}>
                 <Link
@@ -207,7 +202,7 @@ const Success = () => {
                   Access Masterclass Details
                 </Link>
               </motion.div>
-              
+
               <motion.div variants={itemVariants}>
                 <Link
                   to="/"
@@ -219,7 +214,7 @@ const Success = () => {
             </div>
           </motion.div>
         )}
-        
+
         {/* Decorative elements */}
         <div className="absolute -z-10">
           <div className="absolute top-1/2 left-1/2 w-64 h-64 bg-pink-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
