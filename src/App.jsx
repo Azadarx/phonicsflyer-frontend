@@ -10,6 +10,7 @@ import Pricing from './components/Pricing';
 import Footer from './components/Footer';
 import Success from './components/Success';
 import RegisterForm from './components/RegisterForm';
+import Payment from './components/Payment';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
             <Footer />
           </>
         } />
+        <Route path="/payment" element={<Payment />} />
         <Route path="/success" element={<Success />} />
         <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
