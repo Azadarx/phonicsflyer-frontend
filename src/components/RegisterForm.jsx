@@ -29,7 +29,7 @@ const RegisterForm = () => {
     try {
       // Step 1: Register the user and get reference ID
       const registerResponse = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/register`, 
+        `${import.meta.env.VITE_API_BASE_URL}/api/register`,
         formData
       );
 
@@ -38,7 +38,7 @@ const RegisterForm = () => {
       }
 
       const { referenceId } = registerResponse.data;
-      
+
       // Step 2: Create payment order with Cashfree
       const orderResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
@@ -51,25 +51,33 @@ const RegisterForm = () => {
 
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
-      
+
       // Redirect to Cashfree payment page
       // Using Cashfree's JS SDK
       const { paymentSessionId, appId } = orderResponse.data;
-      
+      if (!window.CashFree) {
+        const script = document.createElement("script");
+        script.src = "https://sdk.cashfree.com/js/ui/2.0.0/cashfree.js";
+        script.onload = () => {
+          initCashfree(paymentSessionId, appId);
+        };
+        document.body.appendChild(script);
+      } else {
+        initCashfree(paymentSessionId, appId);
+      }
+
       // Initialize Cashfree SDK
-      window.CashFree.initPopup({
-        appId,
-        paymentSessionId,
-        onSuccess: function(data) {
-          // Payment succeeded, navigate to success page
-          navigate('/success');
-        },
-        onFailure: function(data) {
-          console.error('Payment failed:', data);
-          setError('Your payment was not successful. Please try again.');
-          setLoading(false);
-        }
-      });
+      if (!window.CashFree) {
+        const script = document.createElement("script");
+        script.src = "https://sdk.cashfree.com/js/ui/2.0.0/cashfree.js";
+        script.onload = () => {
+          initCashfree(paymentSessionId, appId);
+        };
+        document.body.appendChild(script);
+      } else {
+        initCashfree(paymentSessionId, appId);
+      }
+
     } catch (err) {
       console.error('Registration/payment error:', err);
       setError('An error occurred during registration. Please try again.');
