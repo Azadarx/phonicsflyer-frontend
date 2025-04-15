@@ -1,8 +1,8 @@
 // src/components/RegisterForm.jsx
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import loadRazorpay from './loadRazorpay';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +12,7 @@ const RegisterForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -25,43 +26,14 @@ const RegisterForm = () => {
     setLoading(true);
     setError('');
 
-    const scriptLoaded = await loadRazorpay();
-    if (!scriptLoaded) {
-      setError("Failed to load Razorpay SDK. Please try again.");
-      setLoading(false);
-      return;
-    }
-    // const baseURL = import.meta.env.VITE_API_BASE_URL;
-
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/register`, formData);
 
-      if (response.data.orderId) {
-        const options = {
-          key: response.data.key_id, // Use the key from the server response
-          amount: response.data.amount,
-          currency: "INR",
-          name: "Inspiring Shereen",
-          description: "Life Coaching Masterclass",
-          order_id: response.data.orderId,
-          handler: function (response) {
-            window.location.href = `/success?payment_id=${response.razorpay_payment_id}`;
-          },
-          prefill: response.data.prefill, // Use the prefill from server
-          theme: {
-            color: "#7C3AED"
-          },
-          config: response.data.config, // Use the UPI config from server
-          modal: {
-            escape: false,
-            ondismiss: function () {
-              alert("Payment popup closed. You can try again!");
-            }
-          }
-        };
-
-        const rzp = new window.Razorpay(options);
-        rzp.open();
+      if (response.data.success) {
+        // Store reference ID in session storage for payment page
+        sessionStorage.setItem('paymentData', JSON.stringify(response.data));
+        // Navigate to payment page
+        navigate('/payment');
       }
     } catch (err) {
       console.error('Registration error:', err);
@@ -163,7 +135,7 @@ const RegisterForm = () => {
                   Processing...
                 </>
               ) : (
-                'Enroll Now - Only ₹99'
+                'Continue to Payment - ₹99 Only'
               )}
             </motion.button>
           </form>
