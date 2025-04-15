@@ -104,6 +104,12 @@ const RegisterForm = () => {
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
         handler: function (response) {
+          // Store reference ID in multiple storage methods for redundancy
+          sessionStorage.setItem('referenceId', referenceId);
+          localStorage.setItem('referenceId', referenceId);
+          
+          console.log('Payment successful, referenceId:', referenceId);
+          
           // Handle successful payment
           const paymentData = {
             razorpay_payment_id: response.razorpay_payment_id,
@@ -111,14 +117,22 @@ const RegisterForm = () => {
             razorpay_signature: response.razorpay_signature,
             referenceId: referenceId
           };
-
+        
           // Verify payment with backend
           axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
             paymentData
-          ).catch(err => console.error("Error confirming payment:", err));
-
-          navigate('/success');
+          )
+          .then(result => {
+            console.log('Payment confirmation success:', result.data);
+            // Navigate with query parameter as backup
+            navigate(`/success?refId=${referenceId}`);
+          })
+          .catch(err => {
+            console.error("Error confirming payment:", err);
+            // Still navigate to success even if confirmation fails
+            navigate(`/success?refId=${referenceId}`);
+          });
         },
         prefill: {
           name: formData.fullName,
