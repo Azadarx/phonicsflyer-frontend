@@ -33,25 +33,30 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const navItemVariants = {
+    hidden: { opacity: 0, y: -5 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
     <motion.nav 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`fixed w-full z-40 transition-all duration-500 backdrop-blur-lg ${
+      className={`fixed w-full z-40 transition-all duration-500 ${
         scrolled 
-          ? 'bg-white/90 shadow-lg py-2' 
-          : 'bg-transparent py-6'
+          ? 'bg-white shadow-lg py-3' 
+          : 'bg-white/80 backdrop-blur-lg py-4'
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between">
           <motion.div 
             className="flex-shrink-0"
             whileHover={{ scale: 1.05 }}
           >
             <Link to="/" className="flex items-center">
-              <span className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-500">
+              <span className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600">
                 Inspiring Shereen
               </span>
               <motion.span 
@@ -66,15 +71,21 @@ const Navbar = () => {
           </motion.div>
           
           <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-8">
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              transition={{ staggerChildren: 0.1, delayChildren: 0.2 }}
+              className="ml-10 flex items-center space-x-8"
+            >
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
                 <motion.a
                   key={item}
+                  variants={navItemVariants}
                   href={item === 'home' ? '/' : `#${item}`}
                   className={`relative px-3 py-2 text-sm font-medium transition-colors duration-300 ${
                     activeSection === item
-                      ? 'text-purple-600'
-                      : 'text-gray-700 hover:text-purple-500'
+                      ? 'text-violet-600'
+                      : 'text-gray-700 hover:text-violet-500'
                   }`}
                   whileHover={{ scale: 1.1 }}
                 >
@@ -82,7 +93,7 @@ const Navbar = () => {
                   {activeSection === item && (
                     <motion.span
                       layoutId="navUnderline"
-                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-pink-500"
+                      className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600"
                       initial={{ width: 0 }}
                       animate={{ width: '100%' }}
                       transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -92,12 +103,13 @@ const Navbar = () => {
               ))}
               
               <motion.div
+                variants={navItemVariants}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <Link 
                   to="/register" 
-                  className="bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white px-6 py-2.5 rounded-full font-medium shadow-lg hover:shadow-purple-200 transition-all duration-300"
+                  className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-6 py-2.5 rounded-xl font-medium shadow-lg hover:shadow-violet-200 transition-all duration-300"
                 >
                   <span className="flex items-center">
                     <span>Enroll Now</span>
@@ -107,14 +119,14 @@ const Navbar = () => {
                   </span>
                 </Link>
               </motion.div>
-            </div>
+            </motion.div>
           </div>
           
           <div className="md:hidden">
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => setIsOpen(!isOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-purple-600 focus:outline-none"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-violet-600 focus:outline-none"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isOpen ? (
@@ -136,7 +148,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden bg-white/95 backdrop-blur-md shadow-xl"
+            className="md:hidden overflow-hidden bg-white shadow-xl"
           >
             <div className="px-4 pt-2 pb-4 space-y-3">
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
@@ -150,7 +162,7 @@ const Navbar = () => {
                     href={item === 'home' ? '/' : `#${item}`}
                     className={`block px-4 py-3 rounded-lg text-base font-medium ${
                       activeSection === item
-                        ? 'bg-purple-50 text-purple-600'
+                        ? 'bg-violet-50 text-violet-600'
                         : 'text-gray-700 hover:bg-gray-50'
                     }`}
                     onClick={() => setIsOpen(false)}
@@ -168,7 +180,7 @@ const Navbar = () => {
               >
                 <Link 
                   to="/register" 
-                  className="block w-full bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white py-3 text-center rounded-full font-medium shadow-md"
+                  className="block w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 text-center rounded-xl font-medium shadow-md"
                   onClick={() => setIsOpen(false)}
                 >
                   Enroll Now
