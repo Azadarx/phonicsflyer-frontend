@@ -72,6 +72,16 @@ const Payment = () => {
     return `upi://pay?pa=${paymentDetails.upiId}&pn=${encodeURIComponent(paymentDetails.name)}&am=${paymentDetails.amount}&cu=${paymentDetails.currency}&tn=Masterclass`;
   };
 
+  // Generate UPI Intent Link
+  const getUpiIntentLink = () => {
+    return `upi://pay?pa=9494100110@yesbank&pn=${encodeURIComponent('Inspiring Shereen')}&am=1&cu=INR&tn=Masterclass`;
+  };
+
+  // Function to open UPI app
+  const openUpiApp = () => {
+    window.location.href = getUpiIntentLink();
+  };
+
   if (!paymentData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center">
@@ -105,12 +115,27 @@ const Payment = () => {
                       type="radio"
                       name="paymentOption"
                       className="mr-3"
+                      checked={selectedOption === 'upiApp'}
+                      onChange={() => handleOptionChange('upiApp')}
+                    />
+                    <div className="flex items-center">
+                      <img src="/upi-icon.png" alt="UPI" className="w-8 h-8 mr-3" onError={(e) => e.target.style.display = 'none'} />
+                      <span className="font-medium">Pay using UPI Apps</span>
+                      <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Recommended</span>
+                    </div>
+                  </label>
+                  
+                  <label className="flex items-center p-3 border rounded-lg cursor-pointer hover:bg-purple-50">
+                    <input
+                      type="radio"
+                      name="paymentOption"
+                      className="mr-3"
                       checked={selectedOption === 'upi'}
                       onChange={() => handleOptionChange('upi')}
                     />
                     <div className="flex items-center">
                       <img src="/upi-icon.png" alt="UPI" className="w-8 h-8 mr-3" onError={(e) => e.target.style.display = 'none'} />
-                      <span className="font-medium">UPI Payment</span>
+                      <span className="font-medium">UPI QR Code</span>
                     </div>
                   </label>
                   
@@ -150,6 +175,45 @@ const Payment = () => {
           ) : (
             <>
               <div className="mb-8">
+                {selectedOption === 'upiApp' && (
+                  <div className="bg-purple-50 p-6 rounded-lg">
+                    <div className="text-center mb-4">
+                      <h3 className="font-medium text-lg text-gray-800">Pay using UPI App</h3>
+                      <p className="text-gray-600 mt-2">Click the button below to open your UPI app</p>
+                    </div>
+                    
+                    <div className="flex justify-center mb-6">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={openUpiApp}
+                        className="bg-green-600 text-white py-3 px-8 rounded-lg font-medium shadow-md hover:bg-green-700 transition-all duration-300 flex items-center"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
+                        </svg>
+                        Pay ₹1 Now
+                      </motion.button>
+                    </div>
+                    
+                    <div className="text-center">
+                      <p className="text-sm text-gray-500">
+                        This will open your UPI payment apps installed on your device
+                      </p>
+                      <div className="mt-4">
+                        <p className="font-medium">UPI ID</p>
+                        <div className="flex items-center justify-center mt-1">
+                          <span className="bg-white border px-4 py-2 rounded">9494100110@yesbank</span>
+                        </div>
+                      </div>
+                      <div className="mt-3">
+                        <p className="font-medium">Name</p>
+                        <p className="mt-1">Inspiring Shereen</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 {selectedOption === 'upi' && (
                   <div className="bg-purple-50 p-6 rounded-lg">
                     <div className="text-center mb-4">
