@@ -218,15 +218,15 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-6 text-white">Contact & Newsletter</h3>
             <motion.ul className="space-y-4" variants={containerVariants}>
               <motion.li variants={itemVariants}>
-                <a href="mailto:info@inspiringshereen.com" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
+                <a href="mailto:inspiringshereen@gmail.com" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
                   <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
-                  info@inspiringshereen.com
+                  inspiringshereen@gmail.com
                 </a>
               </motion.li>
               <motion.li variants={itemVariants}>
                 <a href="tel:+1234567890" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
                   <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
-                  +123 456 7890
+                  +91 99516 11674
                 </a>
               </motion.li>
             </motion.ul>
