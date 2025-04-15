@@ -1,5 +1,5 @@
 // src/components/RegisterForm.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
@@ -12,52 +12,23 @@ const RegisterForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [cashfreeLoaded, setCashfreeLoaded] = useState(false);
   const navigate = useNavigate();
 
-  // Load Cashfree SDK dynamically
-  useEffect(() => {
-    const loadCashfreeSDK = async () => {
-      // Remove any existing Cashfree script to avoid duplicates
-      const existingScript = document.querySelector('script[src*="cashfree.js"]');
-      if (existingScript) {
-        existingScript.remove();
-      }
-
-      return new Promise((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
-        script.async = true;
-        script.crossOrigin = "anonymous";
-        
-        script.onload = () => {
-          console.log("Cashfree SDK loaded successfully");
-          setCashfreeLoaded(true);
-          resolve(true);
-        };
-        
-        script.onerror = (error) => {
-          console.error("Failed to load Cashfree SDK", error);
-          setError("Payment gateway failed to load. Please refresh the page.");
-          reject(error);
-        };
-        
-        document.body.appendChild(script);
-      });
-    };
-
-    loadCashfreeSDK().catch(err => {
-      console.error("Error in Cashfree SDK loading:", err);
+  // Load Razorpay script dynamically
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+        setError("Payment gateway failed to load. Please refresh the page.");
+      };
+      document.body.appendChild(script);
     });
-
-    // Cleanup function to remove the script when component unmounts
-    return () => {
-      const script = document.querySelector('script[src*="cashfree.js"]');
-      if (script) {
-        script.remove();
-      }
-    };
-  }, []);
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -84,7 +55,7 @@ const RegisterForm = () => {
 
       const { referenceId } = registerResponse.data;
 
-      // Step 2: Create payment order with Cashfree
+      // Step 2: Create payment order with Razorpay
       const orderResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
         { referenceId }
@@ -97,42 +68,59 @@ const RegisterForm = () => {
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
 
-      // Get payment session ID and app ID from the response
-      const { appId, orderToken } = orderResponse.data;
+      // Get order ID and key from the response
+      const { orderId, razorpayKey } = orderResponse.data;
 
-      // Check if Cashfree SDK is available in window
-      if (!window.CashFree) {
-        // If SDK not loaded after waiting, throw error
-        throw new Error('Payment gateway not loaded. Please refresh and try again.');
+      // Load Razorpay script
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        throw new Error('Razorpay SDK failed to load');
       }
 
-      // Initialize Cashfree checkout
-      const cashfree = new window.CashFree(appId);
-      const dropConfig = {
-        components: ["order-details", "card", "upi", "netbanking", "app", "paylater"],
-        orderToken: orderToken,
-        onSuccess: (data) => {
-          console.log("Payment success:", data);
-          // Manually confirm payment with backend in case webhook fails
-          axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`, {
-            referenceId: referenceId,
-            transactionId: data.transaction_id || data.order_id
-          }).catch(err => console.error("Error confirming payment:", err));
+      // Initialize Razorpay options
+      const options = {
+        key: razorpayKey,
+        amount: 9900, // amount in paisa (99 INR)
+        currency: "INR",
+        name: "Inspiring Shereen",
+        description: "Life-Changing Masterclass Registration",
+        order_id: orderId,
+        handler: function (response) {
+          // Handle successful payment
+          const paymentData = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            referenceId: referenceId
+          };
+          
+          // Verify payment with backend
+          axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
+            paymentData
+          ).catch(err => console.error("Error confirming payment:", err));
           
           navigate('/success');
         },
-        onFailure: (data) => {
-          console.error("Payment failed:", data);
-          setError('Payment failed: ' + (data.message || 'Please try again'));
-          setLoading(false);
+        prefill: {
+          name: formData.fullName,
+          email: formData.email,
+          contact: formData.phone
         },
-        onClose: () => {
-          console.log("Payment widget closed");
-          setLoading(false);
+        theme: {
+          color: "#7C3AED" // Purple color to match your theme
         },
+        modal: {
+          ondismiss: function() {
+            setLoading(false);
+            console.log('Payment cancelled');
+          }
+        }
       };
 
-      cashfree.checkout(dropConfig);
+      // Create Razorpay instance and open payment form
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
 
     } catch (err) {
       console.error('Registration/payment error:', err);
