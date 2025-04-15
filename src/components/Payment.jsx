@@ -114,76 +114,54 @@ const Payment = () => {
       setError('Payment data is missing. Please register again.');
       return;
     }
-
+  
     setLoadingCashfree(true);
     setError('');
-
+  
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`, {
         referenceId: paymentData.referenceId
       });
-
+  
       if (response.data.success) {
-        setCashfreePaymentData(response.data);
-
-        // For Cashfree Seamless Checkout, use their JS SDK
-        if (window.Cashfree) {
-          const cashfree = new window.Cashfree(response.data.appId);
-
-          cashfree.checkout({
-            paymentSessionId: response.data.paymentSessionId,
-            returnUrl: `${window.location.origin}/payment?order_id={order_id}&reference_id=${paymentData.referenceId}`,
-          });
-        } else {
-          // Fallback to form-based redirect if SDK isn't loaded
-          const form = document.createElement('form');
-          form.method = 'POST';
-          form.action = 'https://www.cashfree.com/checkout/post/submit';
-
-          // Add the necessary fields
-          const appendField = (name, value) => {
-            const field = document.createElement('input');
-            field.type = 'hidden';
-            field.name = name;
-            field.value = value;
-            form.appendChild(field);
-          };
-
-          // Get the App ID from the response
-          const appId = response.data.appId;
-
-          appendField('appId', appId);
-          appendField('orderId', response.data.orderId);
-          appendField('orderAmount', '99');
-          appendField('orderCurrency', 'INR');
-          appendField('orderNote', 'Life Coaching Masterclass');
-          appendField('customerName', paymentData.fullName || 'Customer');
-          appendField('customerEmail', paymentData.email || 'customer@example.com');
-          appendField('customerPhone', paymentData.phone || '1234567890');
-
-          // Ensure we're using the full absolute URL for returnUrl
-          const baseUrl = window.location.origin;
-          appendField('returnUrl', `${baseUrl}/payment?order_id={order_id}&reference_id=${paymentData.referenceId}`);
-
-          // Same for notify URL - use the backend URL
-          appendField('notifyUrl', `${import.meta.env.VITE_API_BASE_URL}/api/cashfree-webhook`);
-
-          appendField('paymentToken', response.data.orderToken);
-
-          // Append the form to the document and submit it
-          document.body.appendChild(form);
-          form.submit();
-        }
+        // Create and submit Cashfree form
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'https://www.cashfree.com/checkout/post/submit';
+  
+        const appendField = (name, value) => {
+          const field = document.createElement('input');
+          field.type = 'hidden';
+          field.name = name;
+          field.value = value;
+          form.appendChild(field);
+        };
+  
+        appendField('appId', import.meta.env.VITE_CASHFREE_APP_ID);
+        appendField('orderId', response.data.orderId);
+        appendField('orderAmount', '99');
+        appendField('orderCurrency', 'INR');
+        appendField('orderNote', 'Life Coaching Masterclass');
+        appendField('customerName', paymentData.fullName || 'Customer');
+        appendField('customerEmail', paymentData.email || 'customer@example.com');
+        appendField('customerPhone', paymentData.phone || '1234567890');
+        appendField('returnUrl', `https://inspiringshereen.vercel.app/payment?reference_id=${paymentData.referenceId}`);
+        appendField('notifyUrl', `${import.meta.env.VITE_API_BASE_URL}/api/cashfree-webhook`);
+        appendField('paymentToken', response.data.orderToken);
+  
+        document.body.appendChild(form);
+        form.submit();
       } else {
-        setError(response.data.error || 'Failed to initiate payment');
-        setLoadingCashfree(false);
+        setError('Failed to get payment token.');
       }
     } catch (err) {
       console.error('Error creating payment order:', err);
-      setError(err.response?.data?.error || 'Failed to initiate payment. Please try again.');
+      setError('Failed to initiate payment. Please try again.');
+    } finally {
       setLoadingCashfree(false);
     }
   };
+  
 
   // Generate UPI QR code URI - using placeholder UPI ID
   const getUpiQrLink = () => {
