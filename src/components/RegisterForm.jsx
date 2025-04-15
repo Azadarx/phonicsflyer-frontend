@@ -21,6 +21,38 @@ const RegisterForm = () => {
     });
   };
 
+  const initCashfree = (paymentSessionId, appId) => {
+    if (!window.CashFree) {
+      setError('Payment gateway not loaded. Please try again.');
+      setLoading(false);
+      return;
+    }
+    
+    const cashfree = new window.CashFree(appId);
+    const dropConfig = {
+      components: ["order-details", "card", "upi", "netbanking", "app", "paylater"],
+      orderToken: paymentSessionId,
+      onSuccess: (data) => {
+        // On successful payment, navigate to success page
+        console.log("Payment success:", data);
+        navigate('/success');
+      },
+      onFailure: (data) => {
+        // On payment failure, show error
+        console.error("Payment failed:", data);
+        setError('Payment failed. Please try again.');
+        setLoading(false);
+      },
+      onClose: () => {
+        // When payment modal is closed
+        console.log("Payment widget closed");
+        setLoading(false);
+      },
+    };
+    
+    cashfree.checkout(dropConfig);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -52,29 +84,27 @@ const RegisterForm = () => {
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
 
-      // Redirect to Cashfree payment page
-      // Using Cashfree's JS SDK
+      // Get payment session ID and app ID from the response
       const { paymentSessionId, appId } = orderResponse.data;
+      
+      // Load Cashfree SDK if not already loaded
       if (!window.CashFree) {
         const script = document.createElement("script");
         script.src = "https://sdk.cashfree.com/js/ui/2.0.0/cashfree.js";
+        script.async = true;
         script.onload = () => {
+          console.log("Cashfree SDK loaded");
           initCashfree(paymentSessionId, appId);
+        };
+        script.onerror = () => {
+          console.error("Failed to load Cashfree SDK");
+          setError('Failed to load payment gateway. Please try again.');
+          setLoading(false);
         };
         document.body.appendChild(script);
       } else {
-        initCashfree(paymentSessionId, appId);
-      }
-
-      // Initialize Cashfree SDK
-      if (!window.CashFree) {
-        const script = document.createElement("script");
-        script.src = "https://sdk.cashfree.com/js/ui/2.0.0/cashfree.js";
-        script.onload = () => {
-          initCashfree(paymentSessionId, appId);
-        };
-        document.body.appendChild(script);
-      } else {
+        // If already loaded, initialize directly
+        console.log("Using existing Cashfree SDK");
         initCashfree(paymentSessionId, appId);
       }
 
