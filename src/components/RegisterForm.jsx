@@ -1,8 +1,8 @@
 // src/components/RegisterForm.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -90,23 +90,21 @@ const RegisterForm = () => {
             resolve();
             return;
           }
+          useEffect(() => {
+            if (!window.CashFree) {
+              const script = document.createElement("script");
+              script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+              script.crossOrigin = "anonymous";
+              script.onload = () => {
+                console.log("Cashfree SDK loaded");
+              };
+              script.onerror = () => {
+                setError("Failed to load Cashfree SDK");
+              };
+              document.body.appendChild(script);
+            }
+          }, []);
 
-          const script = document.createElement("script");
-          script.src = "https://sdk.cashfree.com/js/v3/cashfree.js"; // Updated URL
-          script.async = true;
-          script.crossOrigin = "anonymous"; // Add crossOrigin attribute
-
-          script.onload = () => {
-            console.log("Cashfree SDK loaded successfully");
-            resolve();
-          };
-
-          script.onerror = (error) => {
-            console.error("Failed to load Cashfree SDK:", error);
-            reject(new Error("Failed to load payment gateway"));
-          };
-
-          document.body.appendChild(script);
         });
       };
 
@@ -250,9 +248,9 @@ const RegisterForm = () => {
             >
               {loading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                   </svg>
                   Processing...
                 </>
