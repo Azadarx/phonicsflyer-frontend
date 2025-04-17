@@ -135,7 +135,7 @@ const Footer = () => {
                 { name: "Contact Us", path: "/ContactUs" },
                 { name: "Terms & Conditions", path: "/TermsandConditions" },
                 { name: "Refund Policy", path: "/RefundandCancellation" },
-                { name: "Privacy Policy", path: "#" }
+                { name: "Privacy Policy", path: "/privacypolicy" }
               ].map((item, index) => (
                 <li key={index}>
                   <Link

@@ -13,6 +13,7 @@ import RegisterForm from './components/RegisterForm';
 import ContactUs from './components/ContactUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
+import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />
+        <Route path="/privacypolicy" element={<RazorpayPrivacyPolicy />} />
         <Route path="/success" element={<Success />} />
         <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
