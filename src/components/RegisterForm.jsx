@@ -14,22 +14,14 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Animation variants
+  // Simplified animation variants - reduced complexity
   const formVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.1
-      }
+      transition: { duration: 0.5 }
     }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
   };
 
   // Load Razorpay script dynamically
@@ -85,6 +77,9 @@ const RegisterForm = () => {
 
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
+      
+      // Save user data in session storage for display on success page
+      sessionStorage.setItem('userData', JSON.stringify(formData));
 
       // Get order ID and key from the response
       const { orderId, razorpayKey } = orderResponse.data;
@@ -161,58 +156,30 @@ const RegisterForm = () => {
     }
   };
 
-  // Animated background elements
-  const backgrounds = [
-    { top: '10%', left: '5%', size: 200, delay: 0 },
-    { top: '30%', right: '10%', size: 150, delay: 1 },
-    { top: '70%', left: '15%', size: 180, delay: 2 },
-    { top: '85%', right: '5%', size: 120, delay: 3 },
-  ];
-
+  // Reduced to just one background element for visual effect without performance impact
   return (
     <section id="register" className="relative py-20 overflow-hidden">
-      {/* Animated background elements */}
-      {backgrounds.map((bg, index) => (
-        <motion.div
-          key={index}
-          className="absolute rounded-full bg-gradient-to-r from-violet-300/30 to-fuchsia-300/30 blur-3xl"
-          style={{
-            top: bg.top,
-            left: bg.left,
-            right: bg.right,
-            width: bg.size,
-            height: bg.size,
-            zIndex: 0
-          }}
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            repeat: Infinity,
-            duration: 10,
-            delay: bg.delay,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
+      {/* Single animated background element */}
+      <div 
+        className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-violet-300/30 to-fuchsia-300/30 blur-3xl"
+        style={{
+          width: '50%',
+          height: '50%',
+          zIndex: 0
+        }}
+      />
 
       <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6 }}
-            className="inline-block px-4 py-1.5 bg-violet-100 rounded-full mb-4"
-          >
+          <div className="inline-block px-4 py-1.5 bg-violet-100 rounded-full mb-4">
             <span className="text-violet-700 font-semibold">Limited Time Offer</span>
-          </motion.div>
+          </div>
 
           <h2 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 mb-4">
             Register Now
@@ -241,7 +208,7 @@ const RegisterForm = () => {
           viewport={{ once: true }}
           className="bg-white rounded-2xl shadow-xl p-8 border border-violet-100 relative z-10"
         >
-          {/* Decorative elements */}
+          {/* Decorative elements - keeping just two static elements */}
           <div className="absolute -top-6 -right-6 w-12 h-12 bg-fuchsia-500 rounded-full flex items-center justify-center shadow-lg transform rotate-12">
             <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -254,8 +221,8 @@ const RegisterForm = () => {
             </svg>
           </div>
 
-          <motion.form onSubmit={handleSubmit}>
-            <motion.div variants={itemVariants} className="mb-6">
+          <form onSubmit={handleSubmit}>
+            <div className="mb-6">
               <label htmlFor="fullName" className="block text-gray-700 font-medium mb-2">Full Name</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -274,9 +241,9 @@ const RegisterForm = () => {
                   required
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="mb-6">
+            <div className="mb-6">
               <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email Address</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -295,9 +262,9 @@ const RegisterForm = () => {
                   required
                 />
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div variants={itemVariants} className="mb-8">
+            <div className="mb-8">
               <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">Phone Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -316,23 +283,20 @@ const RegisterForm = () => {
                   required
                 />
               </div>
-            </motion.div>
+            </div>
 
             {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm"
-              >
+              <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
                 {error}
-              </motion.div>
+              </div>
             )}
 
             <motion.button
-              variants={itemVariants}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-bold rounded-lg transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full py-4 px-6 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-bold rounded-lg transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="flex items-center justify-center">
@@ -352,15 +316,15 @@ const RegisterForm = () => {
               )}
             </motion.button>
 
-            <motion.p variants={itemVariants} className="text-center text-gray-500 text-sm mt-4">
+            <p className="text-center text-gray-500 text-sm mt-4">
               <span className="flex items-center justify-center">
                 <svg className="w-5 h-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
                 Secure payment powered by Razorpay
               </span>
-            </motion.p>
-          </motion.form>
+            </p>
+          </form>
         </motion.div>
       </div>
     </section>

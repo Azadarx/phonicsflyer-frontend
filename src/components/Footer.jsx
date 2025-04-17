@@ -7,23 +7,6 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
   const [hoveredIcon, setHoveredIcon] = useState(null);
 
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        when: "beforeChildren",
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 }
-  };
-
   // Social media icons with hover effects
   const socialLinks = [
     {
@@ -63,60 +46,14 @@ const Footer = () => {
 
   return (
     <footer className="relative overflow-hidden bg-gradient-to-b from-indigo-900 to-purple-900 text-white">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="absolute top-0 left-0 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"
-          animate={{
-            x: [0, 30, 0],
-            y: [0, 20, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-0 right-0 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"
-          animate={{
-            x: [0, -30, 0],
-            y: [0, -20, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 left-1/3 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.1, 0.15, 0.1],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      </div>
-
-      {/* Glowing highlights */}
+      {/* Reduced background elements - just 1 static div instead of animated ones */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-400/20 via-transparent to-transparent"></div>
 
       {/* Footer content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-5 gap-12"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
           {/* Brand section */}
-          <motion.div variants={itemVariants} className="md:col-span-2">
+          <div className="md:col-span-2">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
@@ -133,7 +70,7 @@ const Footer = () => {
               Transforming lives through holistic coaching and empowering you to reach your full potential.
             </p>
 
-            {/* Social icons */}
+            {/* Social icons - keep the hover animations as they're interactive */}
             <div className="flex space-x-3">
               {socialLinks.map((link, index) => (
                 <motion.a
@@ -161,14 +98,14 @@ const Footer = () => {
                 </motion.a>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Links */}
-          <motion.div variants={itemVariants} className="md:col-span-1">
+          <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-6 text-white">Quick Links</h3>
-            <motion.ul className="space-y-4" variants={containerVariants}>
+            <ul className="space-y-4">
               {["About", "What You'll Learn", "Coaches", "Event Details"].map((item, index) => (
-                <motion.li key={index} variants={itemVariants}>
+                <li key={index}>
                   <a
                     href={`#${item.toLowerCase().replace(/\s+/g, '')}`}
                     className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
@@ -176,9 +113,9 @@ const Footer = () => {
                     <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
                     {item}
                   </a>
-                </motion.li>
+                </li>
               ))}
-              <motion.li variants={itemVariants}>
+              <li>
                 <Link
                   to="/register"
                   className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
@@ -186,21 +123,21 @@ const Footer = () => {
                   <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
                   Register
                 </Link>
-              </motion.li>
-            </motion.ul>
-          </motion.div>
+              </li>
+            </ul>
+          </div>
 
           {/* More Links */}
-          <motion.div variants={itemVariants} className="md:col-span-1">
+          <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-6 text-white">Resources</h3>
-            <motion.ul className="space-y-4" variants={containerVariants}>
+            <ul className="space-y-4">
               {[
                 { name: "Contact Us", path: "/ContactUs" },
                 { name: "Terms & Conditions", path: "/TermsandConditions" },
                 { name: "Refund Policy", path: "/RefundandCancellation" },
                 { name: "Privacy Policy", path: "#" }
               ].map((item, index) => (
-                <motion.li key={index} variants={itemVariants}>
+                <li key={index}>
                   <Link
                     to={item.path}
                     className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
@@ -208,32 +145,32 @@ const Footer = () => {
                     <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
                     {item.name}
                   </Link>
-                </motion.li>
+                </li>
               ))}
-            </motion.ul>
-          </motion.div>
+            </ul>
+          </div>
 
           {/* Contact & Newsletter */}
-          <motion.div variants={itemVariants} className="md:col-span-1">
+          <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-6 text-white">Contact & Newsletter</h3>
-            <motion.ul className="space-y-4" variants={containerVariants}>
-              <motion.li variants={itemVariants}>
+            <ul className="space-y-4">
+              <li>
                 <a href="mailto:inspiringshereen@gmail.com" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
                   <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
                   inspiringshereen@gmail.com
                 </a>
-              </motion.li>
-              <motion.li variants={itemVariants}>
+              </li>
+              <li>
                 <a href="tel:+1234567890" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
                   <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
                   +91 99516 11674
                 </a>
-              </motion.li>
-            </motion.ul>
-          </motion.div>
+              </li>
+            </ul>
+          </div>
 
           {/* Newsletter */}
-          <motion.div variants={itemVariants} className="md:col-span-1">
+          <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-6 text-white">Stay Updated</h3>
             <p className="text-gray-300 mb-4">Subscribe to our newsletter for latest updates and events.</p>
             <form className="space-y-3">
@@ -252,21 +189,15 @@ const Footer = () => {
                 Subscribe
               </button>
             </form>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
         {/* Copyright */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          viewport={{ once: true }}
-          className="mt-16 pt-8 border-t border-white/10 text-center"
-        >
+        <div className="mt-16 pt-8 border-t border-white/10 text-center">
           <p className="text-gray-400">
             © {currentYear} Inspiring Shereen. All rights reserved.
           </p>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );
