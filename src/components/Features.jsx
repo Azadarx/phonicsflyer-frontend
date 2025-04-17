@@ -45,25 +45,12 @@ const Features = () => {
     }
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5 } }
-  };
+  // Removed staggering animations for child elements
+  // Using simple transitions for hover effects only
 
   return (
     <section id="features" ref={ref} className="py-24 bg-gradient-to-br from-violet-50 via-fuchsia-50 to-cyan-50 relative overflow-hidden">
-      {/* Decorative elements */}
+      {/* Reduced to just 2 static decorative elements */}
       <div className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-pink-300 to-rose-300 rounded-full blur-3xl opacity-30"></div>
       <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-violet-300 to-blue-300 rounded-full blur-3xl opacity-30"></div>
       
@@ -84,21 +71,11 @@ const Features = () => {
           </p>
         </motion.div>
 
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "show" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuresList.map((feature, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={itemVariants}
-              whileHover={{ 
-                y: -10,
-                boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)"
-              }}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden group"
+              className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:translate-y-[-10px] hover:shadow-xl transition-all duration-300"
             >
               <div className="h-2 bg-gradient-to-r from-violet-600 to-fuchsia-600"></div>
               <div className="p-8">
@@ -108,9 +85,9 @@ const Features = () => {
                 <h3 className="text-2xl font-bold text-gray-800 mb-3">{feature.title}</h3>
                 <p className="text-gray-600">{feature.description}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -119,10 +96,7 @@ const Features = () => {
           className="text-center mt-16"
         >
           <motion.button
-            whileHover={{ 
-              scale: 1.05,
-              boxShadow: "0 15px 30px rgba(0, 0, 0, 0.1)"
-            }}
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white px-10 py-4 rounded-xl text-lg font-medium shadow-xl hover:translate-y-1 transition-all duration-300"
             onClick={() => window.location.href = "/register"}

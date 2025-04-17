@@ -28,28 +28,9 @@ const Coaches = () => {
     }
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
   return (
     <section id="coaches" ref={ref} className="py-24 bg-white relative overflow-hidden">
-      {/* Colorful background elements */}
+      {/* Colorful background elements - reduced to just 2 static elements */}
       <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 transform -skew-y-2"></div>
       <div className="absolute top-20 left-0 w-full h-20 bg-gradient-to-r from-pink-500 via-fuchsia-500 to-violet-500 transform -skew-y-3 opacity-70"></div>
       
@@ -70,23 +51,17 @@ const Coaches = () => {
           </p>
         </motion.div>
 
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="grid grid-cols-1 md:grid-cols-2 gap-16"
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           {coaches.map((coach, index) => (
-            <motion.div
+            <div
               key={index}
-              variants={itemVariants}
               className="relative"
               onMouseEnter={() => setActiveCoach(index)}
               onMouseLeave={() => setActiveCoach(null)}
             >
               <div className="flex flex-col items-center">
                 <div className="relative mb-8 group">
-                  {/* Decorative rings */}
+                  {/* Single decorative ring with animation */}
                   <motion.div 
                     animate={{ 
                       rotate: [0, 360],
@@ -99,18 +74,6 @@ const Coaches = () => {
                     className="absolute inset-0 -m-6 rounded-full border-2 border-dashed border-violet-300 z-0"
                   ></motion.div>
                   
-                  <motion.div 
-                    animate={{ 
-                      rotate: [360, 0],
-                      scale: activeCoach === index ? 1.15 : 1
-                    }}
-                    transition={{ 
-                      rotate: { repeat: Infinity, duration: 30, ease: "linear" },
-                      scale: { duration: 0.5 }
-                    }}
-                    className="absolute inset-0 -m-12 rounded-full border-2 border-dashed border-fuchsia-300 z-0"
-                  ></motion.div>
-                  
                   {/* Coach image */}
                   <div className="relative z-10">
                     <div className="w-64 h-64 rounded-full overflow-hidden border-4 border-white shadow-xl">
@@ -120,25 +83,10 @@ const Coaches = () => {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    
-                    {/* Glowing effect on hover */}
-                    <motion.div 
-                      animate={{ 
-                        opacity: activeCoach === index ? 0.6 : 0 
-                      }}
-                      transition={{ duration: 0.3 }}
-                      className="absolute inset-0 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 filter blur-xl z-0"
-                    ></motion.div>
                   </div>
                 </div>
                 
-                <motion.div 
-                  className="text-center"
-                  animate={{ 
-                    y: activeCoach === index ? -10 : 0 
-                  }}
-                  transition={{ duration: 0.3 }}
-                >
+                <div className="text-center">
                   <h3 className="text-2xl font-bold text-gray-800 mb-1">{coach.name}</h3>
                   <p className="text-fuchsia-600 font-medium mb-3">{coach.title}</p>
                   <p className="text-gray-600 italic mb-6">{coach.description}</p>
@@ -172,11 +120,11 @@ const Coaches = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
+                </div>
               </div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
