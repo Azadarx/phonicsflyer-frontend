@@ -16,6 +16,12 @@ const Navbar = () => {
         setScrolled(false);
       }
       
+      // Check if we're at the top for "home" active state
+      if (window.scrollY < 100) {
+        setActiveSection('home');
+        return;
+      }
+      
       // Active section detection
       const sections = ['about', 'features', 'coaches', 'pricing'];
       sections.forEach(section => {
@@ -94,6 +100,7 @@ const Navbar = () => {
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-violet-600 focus:outline-none"
+              aria-label="Toggle menu"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isOpen ? (
