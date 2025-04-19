@@ -136,6 +136,7 @@ const RegisterForm = () => {
         amount: 100, // amount in paisa (99 INR)
         currency: "INR",
         name: "Inspiring Shereen",
+        method: "upi",
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
         handler: async function (response) {
