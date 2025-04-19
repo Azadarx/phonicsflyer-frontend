@@ -1,6 +1,8 @@
 // src/components/Testimonials.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const Testimonials = () => {
   const testimonials = [
@@ -25,6 +27,8 @@ const Testimonials = () => {
   ];
 
   return (
+    <>
+    <Navbar/>
     <section className="py-24 relative overflow-hidden bg-gradient-to-b from-purple-50 to-indigo-100">
       {/* Reduced to just 2 background elements with minimal animation */}
       <div className="absolute inset-0 z-0">
@@ -124,6 +128,8 @@ const Testimonials = () => {
         </div>
       </div>
     </section>
+    <Footer/>
+    </>
   );
 };
 

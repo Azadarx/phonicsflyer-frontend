@@ -2,6 +2,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Shield, CheckCircle } from 'lucide-react';
+import Navbar from './Navbar';
+import Footer from './Footer';
 
 const TermsAndConditions = () => {
   const fadeIn = {
@@ -27,117 +29,121 @@ const TermsAndConditions = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 pt-28 pb-16">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Animated Header */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="text-center mb-12"
-        >
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 pt-28 pb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Animated Header */}
           <motion.div
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="inline-flex items-center justify-center p-3 bg-white/20 backdrop-blur-sm rounded-full mb-4"
-          >
-            <Shield className="text-white h-6 w-6" />
-          </motion.div>
-          
-          <motion.h1
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, duration: 0.8 }}
-            className="text-4xl font-bold text-white mb-3"
-          >
-            Terms & Conditions
-          </motion.h1>
-          
-          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="text-white/80 text-lg"
+            transition={{ duration: 0.8 }}
+            className="text-center mb-12"
           >
-            Last updated on 15-04-2025 14:32:48
-          </motion.p>
-        </motion.div>
-
-        {/* Content Card */}
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="bg-white rounded-2xl shadow-2xl p-8 md:p-10 relative overflow-hidden"
-        >
-          {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-b from-purple-200 to-transparent rounded-full opacity-20 -mr-32 -mt-32"></div>
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-t from-blue-200 to-transparent rounded-full opacity-20 -ml-32 -mb-32"></div>
-          
-          <div className="relative z-10">
             <motion.div
-              variants={fadeIn}
-              initial="hidden"
-              animate="visible"
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="prose max-w-none"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="inline-flex items-center justify-center p-3 bg-white/20 backdrop-blur-sm rounded-full mb-4"
             >
-              <p className="text-gray-700 leading-relaxed mb-8">
-                These Terms and Conditions, along with privacy policy or other terms ("Terms") constitute a binding
-                agreement by and between SHEREEN BEGUM, ("Website Owner" or "we" or "us" or "our") and you
-                ("you" or "your") and relate to your use of our website, goods (as applicable) or services (as applicable)
-                (collectively, "Services").
-              </p>
-              
-              <p className="text-gray-700 leading-relaxed mb-8">
-                By using our website and availing the Services, you agree that you have read and accepted these Terms
-                (including the Privacy Policy). We reserve the right to modify these Terms at any time and without
-                assigning any reason. It is your responsibility to periodically review these Terms to stay informed of
-                updates.
-              </p>
-              
-              <p className="text-gray-700 font-medium mb-6">
-                The use of this website or availing of our Services is subject to the following terms of use:
-              </p>
-              
-              <div className="space-y-6">
-                {termsList.map((term, index) => (
-                  <motion.div
-                    key={index}
-                    variants={fadeIn}
-                    initial="hidden"
-                    whileInView="visible"
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.1 * index, duration: 0.5 }}
-                    className="flex items-start space-x-4 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl"
-                  >
-                    <CheckCircle className="text-purple-600 h-6 w-6 mt-1 flex-shrink-0" />
-                    <p className="text-gray-700">{term}</p>
-                  </motion.div>
-                ))}
-              </div>
+              <Shield className="text-white h-6 w-6" />
             </motion.div>
-            
-            {/* Accept terms button */}
-            <motion.div
+
+            <motion.h1
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+              className="text-4xl font-bold text-white mb-3"
+            >
+              Terms & Conditions
+            </motion.h1>
+
+            <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 1, duration: 0.8 }}
-              className="mt-10 text-center"
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="text-white/80 text-lg"
             >
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
+              Last updated on 15-04-2025 14:32:48
+            </motion.p>
+          </motion.div>
+
+          {/* Content Card */}
+          <motion.div
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.8 }}
+            className="bg-white rounded-2xl shadow-2xl p-8 md:p-10 relative overflow-hidden"
+          >
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-b from-purple-200 to-transparent rounded-full opacity-20 -mr-32 -mt-32"></div>
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-t from-blue-200 to-transparent rounded-full opacity-20 -ml-32 -mb-32"></div>
+
+            <div className="relative z-10">
+              <motion.div
+                variants={fadeIn}
+                initial="hidden"
+                animate="visible"
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="prose max-w-none"
               >
-                I Accept the Terms & Conditions
-              </motion.button>
-            </motion.div>
-          </div>
-        </motion.div>
+                <p className="text-gray-700 leading-relaxed mb-8">
+                  These Terms and Conditions, along with privacy policy or other terms ("Terms") constitute a binding
+                  agreement by and between SHEREEN BEGUM, ("Website Owner" or "we" or "us" or "our") and you
+                  ("you" or "your") and relate to your use of our website, goods (as applicable) or services (as applicable)
+                  (collectively, "Services").
+                </p>
+
+                <p className="text-gray-700 leading-relaxed mb-8">
+                  By using our website and availing the Services, you agree that you have read and accepted these Terms
+                  (including the Privacy Policy). We reserve the right to modify these Terms at any time and without
+                  assigning any reason. It is your responsibility to periodically review these Terms to stay informed of
+                  updates.
+                </p>
+
+                <p className="text-gray-700 font-medium mb-6">
+                  The use of this website or availing of our Services is subject to the following terms of use:
+                </p>
+
+                <div className="space-y-6">
+                  {termsList.map((term, index) => (
+                    <motion.div
+                      key={index}
+                      variants={fadeIn}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                      transition={{ delay: 0.1 * index, duration: 0.5 }}
+                      className="flex items-start space-x-4 bg-gradient-to-r from-purple-50 to-blue-50 p-4 rounded-xl"
+                    >
+                      <CheckCircle className="text-purple-600 h-6 w-6 mt-1 flex-shrink-0" />
+                      <p className="text-gray-700">{term}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              {/* Accept terms button */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 0.8 }}
+                className="mt-10 text-center"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
+                >
+                  I Accept the Terms & Conditions
+                </motion.button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
+      <Footer/>
+    </>
   );
 };
 
