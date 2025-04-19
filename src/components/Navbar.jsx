@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import { AuthModal } from './auth/AuthModal';
-import { UserMenu } from './auth/UserMenu';
+import  useAuth  from '../contexts/AuthContext';
+import  AuthModal  from './auth/AuthModal';
+import  UserMenu  from './auth/UserMenu';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
