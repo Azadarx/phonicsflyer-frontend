@@ -1,6 +1,6 @@
 // src/components/Success.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 
 const Success = () => {
@@ -12,17 +12,19 @@ const Success = () => {
     email: '',
     phone: ''
   });
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     console.log('Success useEffect running');
-    
+
     // Get reference ID from multiple possible sources
-    const referenceId = sessionStorage.getItem('referenceId') || 
-                        localStorage.getItem('referenceId') ||
-                        new URLSearchParams(window.location.search).get('refId');
-    
+    const referenceId = sessionStorage.getItem('referenceId') ||
+      localStorage.getItem('referenceId') ||
+      searchParams.get('refId');
+
     console.log('Reference ID found:', referenceId);
-    
+
     // Try to get user data from session storage
     try {
       const storedUserData = sessionStorage.getItem('userData');
@@ -39,30 +41,57 @@ const Success = () => {
       return;
     }
 
+    // Check if payment was marked as failed
+    const paymentStatus = localStorage.getItem('paymentStatus');
+    if (paymentStatus === 'failed') {
+      console.log('Payment was previously marked as failed, redirecting...');
+      navigate(`/payment-failed?refId=${referenceId}&reason=previous_failure`);
+      return;
+    }
+
     // Store in both storage methods for redundancy
     sessionStorage.setItem('referenceId', referenceId);
     localStorage.setItem('referenceId', referenceId);
 
     // Verify the payment with the backend
     verifyPayment(referenceId);
-  }, []);
+  }, [navigate, searchParams]);
 
   const verifyPayment = async (referenceId) => {
     try {
       console.log('Verifying payment for:', referenceId);
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/check-payment?reference_id=${referenceId}`;
       console.log('API URL:', apiUrl);
-      
+
       const response = await axios.get(apiUrl);
       console.log('Payment verification response:', response.data);
 
-      setOrderDetails({
-        referenceId,
-        paymentStatus: response.data.success ? 'Confirmed' : 'Processing',
-        amount: '₹99',
-        date: new Date().toLocaleDateString()
-      });
-      setStatus('success');
+      if (response.data.success) {
+        // Clear any failed payment marker
+        localStorage.removeItem('paymentStatus');
+
+        setOrderDetails({
+          referenceId,
+          paymentStatus: 'Confirmed',
+          amount: '₹99',
+          date: new Date().toLocaleDateString()
+        });
+        setStatus('success');
+      } else {
+        // If backend indicates payment is still pending
+        if (response.data.status === 'PENDING') {
+          setOrderDetails({
+            referenceId,
+            paymentStatus: 'Processing',
+            amount: '₹99',
+            date: new Date().toLocaleDateString()
+          });
+          setStatus('pending');
+        } else {
+          // If payment is unknown or invalid, redirect to payment failed
+          navigate(`/payment-failed?refId=${referenceId}&reason=verification_failed`);
+        }
+      }
     } catch (error) {
       console.error('Error verifying payment:', error);
       setOrderDetails({
@@ -98,18 +127,18 @@ const Success = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
               </svg>
             </div>
-            
+
             <h1 className="text-2xl font-bold text-gray-800 mb-4">
               Registration Successful!
             </h1>
-            
+
             <p className="text-gray-600 mb-6">
               Thank you for registering for the masterclass. Your spot is confirmed!
             </p>
-            
+
             <div className="bg-purple-50 rounded-lg p-6 mb-6 text-left">
               <h2 className="text-lg font-semibold text-purple-800 mb-3">Registration Details</h2>
-              
+
               {userData.fullName && (
                 <div className="flex items-center mb-2">
                   <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,7 +149,7 @@ const Success = () => {
                   </p>
                 </div>
               )}
-              
+
               {userData.email && (
                 <div className="flex items-center mb-2">
                   <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,7 +160,7 @@ const Success = () => {
                   </p>
                 </div>
               )}
-              
+
               {userData.phone && (
                 <div className="flex items-center mb-2">
                   <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +171,7 @@ const Success = () => {
                   </p>
                 </div>
               )}
-              
+
               <div className="border-t border-purple-200 my-3 pt-3">
                 {orderDetails.referenceId && (
                   <div className="flex items-center mb-2">
@@ -154,7 +183,7 @@ const Success = () => {
                     </p>
                   </div>
                 )}
-                
+
                 {orderDetails.paymentStatus && (
                   <div className="flex items-center mb-2">
                     <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +194,7 @@ const Success = () => {
                     </p>
                   </div>
                 )}
-                
+
                 {orderDetails.amount && (
                   <div className="flex items-center mb-2">
                     <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -176,7 +205,7 @@ const Success = () => {
                     </p>
                   </div>
                 )}
-                
+
                 {orderDetails.date && (
                   <div className="flex items-center">
                     <svg className="w-5 h-5 text-purple-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -189,7 +218,7 @@ const Success = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 text-left">
               <div className="flex">
                 <svg className="h-5 w-5 text-yellow-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -200,7 +229,7 @@ const Success = () => {
                 </p>
               </div>
             </div>
-            
+
             <div className="space-y-4">
               <Link
                 to="/"

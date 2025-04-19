@@ -14,6 +14,8 @@ import ContactUs from './components/ContactUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
 import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
+import PaymentFailed from './components/PaymentFailed ';
+import PaymentCallback from './components/PaymentCallback ';
 
 function App() {
   return (
@@ -43,6 +45,8 @@ function App() {
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />
         <Route path="/privacypolicy" element={<RazorpayPrivacyPolicy />} />
+        <Route path="/payment-failed" element={<PaymentFailed />} />
+        <Route path="/payment-callback" element={<PaymentCallback />} />
         <Route path="/success" element={<Success />} />
         <Route path="/*" element={<Navigate to="/" />} />
       </Routes>
