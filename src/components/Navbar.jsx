@@ -60,7 +60,8 @@ const Navbar = () => {
             </Link>
           </div>
           
-          <div className="hidden md:flex items-center">
+          {/* Updated desktop navigation to apply from min-width 400px */}
+          <div className="hidden sm:flex items-center">
             <div className="flex items-center space-x-6">
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
                 <a
@@ -96,7 +97,8 @@ const Navbar = () => {
             </div>
           </div>
           
-          <div className="md:hidden">
+          {/* Mobile menu button - now only shows below 400px */}
+          <div className="sm:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-violet-600 focus:outline-none"
@@ -114,7 +116,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - now only shows below 400px */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -122,7 +124,7 @@ const Navbar = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="md:hidden overflow-hidden bg-white shadow-xl"
+            className="sm:hidden overflow-hidden bg-white shadow-xl"
           >
             <div className="px-4 pt-2 pb-4 space-y-1">
               {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
@@ -144,7 +146,7 @@ const Navbar = () => {
               <div className="pt-2 px-4">
                 <Link 
                   to="/register" 
-                  className="block w-full bg-violet-600 hover:bg-violet-700 text-white py-2 text-center rounded-lg font-medium transition-colors duration-300"
+                  className="block w-full bg-violet-600 hover:bg-violet-700 text-white py-2 text-center rounded-lg font-medium transition-all duration-300"
                   onClick={() => setIsOpen(false)}
                 >
                   Enroll Now
