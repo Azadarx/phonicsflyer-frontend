@@ -1,10 +1,11 @@
 // src/components/RegisterForm.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { useAuth } from '../contexts/AuthContext';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +16,22 @@ const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { currentUser, signup, login, updateUserRegistration } = useAuth();
 
-  // Simplified animation variants - reduced complexity
+  // Pre-fill form with user data if logged in
+  useEffect(() => {
+    if (currentUser) {
+      // Get user data from auth context
+      const userData = {
+        fullName: currentUser.displayName || formData.fullName,
+        email: currentUser.email || formData.email,
+        phone: formData.phone // Phone may need to be fetched from Firestore
+      };
+      setFormData(userData);
+    }
+  }, [currentUser]);
+
+  // Simplified animation variants
   const formVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
@@ -55,7 +70,30 @@ const RegisterForm = () => {
     setError('');
 
     try {
-      // Step 1: Register the user and get reference ID
+      // Step 1: Create an account if user is not logged in
+      let user = currentUser;
+      if (!user) {
+        // Generate a random password for new users
+        const tempPassword = Math.random().toString(36).slice(-8);
+        try {
+          // Try signup first
+          user = await signup(formData.email, tempPassword, formData.fullName, formData.phone);
+        } catch (signupError) {
+          // If email already exists, try login (will fail with wrong password, which is expected)
+          if (signupError.code === 'auth/email-already-in-use') {
+            try {
+              await login(formData.email, '');  // This will fail as we don't know the password
+            } catch (loginError) {
+              // This is expected to fail but we can continue with registration
+              console.log("User already exists, continuing with registration process");
+            }
+          } else {
+            throw signupError;
+          }
+        }
+      }
+
+      // Step 2: Register the user and get reference ID
       const registerResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/register`,
         formData
@@ -67,7 +105,7 @@ const RegisterForm = () => {
 
       const { referenceId } = registerResponse.data;
 
-      // Step 2: Create payment order with Razorpay
+      // Step 3: Create payment order with Razorpay
       const orderResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
         { referenceId }
@@ -77,10 +115,10 @@ const RegisterForm = () => {
         throw new Error('Failed to create payment order');
       }
 
-      // Save reference ID in session storage for later use
+      // Save reference ID in session storage
       sessionStorage.setItem('referenceId', referenceId);
 
-      // Save user data in session storage for display on success page
+      // Save user data in session storage
       sessionStorage.setItem('userData', JSON.stringify(formData));
 
       // Get order ID and key from the response
@@ -100,7 +138,7 @@ const RegisterForm = () => {
         name: "Inspiring Shereen",
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
-        handler: function (response) {
+        handler: async function (response) {
           // Store reference ID in multiple storage methods for redundancy
           sessionStorage.setItem('referenceId', referenceId);
           localStorage.setItem('referenceId', referenceId);
@@ -115,21 +153,33 @@ const RegisterForm = () => {
             referenceId: referenceId
           };
 
-          // Verify payment with backend
-          axios.post(
-            `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
-            paymentData
-          )
-            .then(result => {
-              console.log('Payment confirmation success:', result.data);
-              // Navigate with query parameter as backup
-              navigate(`/success?refId=${referenceId}`);
-            })
-            .catch(err => {
-              console.error("Error confirming payment:", err);
-              // Still navigate to success even if confirmation fails
-              navigate(`/success?refId=${referenceId}`);
-            });
+          try {
+            // Verify payment with backend
+            const result = await axios.post(
+              `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
+              paymentData
+            );
+
+            console.log('Payment confirmation success:', result.data);
+
+            // Update user's registration data in Firebase if logged in
+            if (currentUser) {
+              await updateUserRegistration(referenceId, {
+                orderId,
+                paymentId: response.razorpay_payment_id,
+                amount: '₹99',
+                paymentStatus: 'Confirmed',
+                date: new Date().toISOString()
+              });
+            }
+
+            // Navigate with query parameter as backup
+            navigate(`/success?refId=${referenceId}`);
+          } catch (err) {
+            console.error("Error confirming payment:", err);
+            // Still navigate to success even if confirmation fails
+            navigate(`/success?refId=${referenceId}`);
+          }
         },
         prefill: {
           name: formData.fullName,
@@ -158,12 +208,11 @@ const RegisterForm = () => {
     }
   };
 
-  // Reduced to just one background element for visual effect without performance impact
   return (
     <>
       <Navbar />
       <section id="register" className="relative py-20 overflow-hidden">
-        {/* Single animated background element */}
+        {/* Background element */}
         <div
           className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-violet-300/30 to-fuchsia-300/30 blur-3xl"
           style={{
@@ -212,7 +261,17 @@ const RegisterForm = () => {
             viewport={{ once: true }}
             className="bg-white rounded-2xl shadow-xl p-8 border border-violet-100 relative z-10"
           >
-            {/* Decorative elements - keeping just two static elements */}
+            {/* User status indicator */}
+            {currentUser && (
+              <div className="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Signed in as {currentUser.email}
+              </div>
+            )}
+
+            {/* Decorative elements */}
             <div className="absolute -top-6 -right-6 w-12 h-12 bg-fuchsia-500 rounded-full flex items-center justify-center shadow-lg transform rotate-12">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -264,6 +323,7 @@ const RegisterForm = () => {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-600"
                     placeholder="Your email address"
                     required
+                    readOnly={currentUser !== null} // Make email readonly if user is logged in
                   />
                 </div>
               </div>
@@ -332,7 +392,7 @@ const RegisterForm = () => {
           </motion.div>
         </div>
       </section>
-      <Footer/>
+      <Footer />
     </>
   );
 };

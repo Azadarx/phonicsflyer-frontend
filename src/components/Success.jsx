@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { useAuth } from '../contexts/AuthContext';
 
 const Success = () => {
   console.log('Success component rendering');
@@ -15,6 +16,7 @@ const Success = () => {
     phone: ''
   });
   const navigate = useNavigate();
+  const { currentUser, getUserData, updateUserRegistration } = useAuth();
 
   useEffect(() => {
     console.log('Success useEffect running');
@@ -26,15 +28,35 @@ const Success = () => {
 
     console.log('Reference ID found:', referenceId);
 
-    // Try to get user data from session storage
-    try {
-      const storedUserData = sessionStorage.getItem('userData');
-      if (storedUserData) {
-        setUserData(JSON.parse(storedUserData));
+    const fetchData = async () => {
+      // Try to get user data from auth context first if user is logged in
+      if (currentUser && currentUser.uid) {
+        try {
+          const authUserData = await getUserData(currentUser.uid);
+          if (authUserData) {
+            setUserData({
+              fullName: authUserData.fullName || currentUser.displayName || '',
+              email: authUserData.email || currentUser.email || '',
+              phone: authUserData.phone || ''
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching authenticated user data:', error);
+        }
+      } else {
+        // Fall back to session storage if not logged in
+        try {
+          const storedUserData = sessionStorage.getItem('userData');
+          if (storedUserData) {
+            setUserData(JSON.parse(storedUserData));
+          }
+        } catch (e) {
+          console.error('Error parsing user data:', e);
+        }
       }
-    } catch (e) {
-      console.error('Error parsing user data:', e);
-    }
+    };
+    
+    fetchData();
 
     if (!referenceId) {
       console.warn('No reference ID found - redirecting to home page');
@@ -48,7 +70,7 @@ const Success = () => {
 
     // Verify the payment with the backend
     verifyPayment(referenceId);
-  }, [navigate]);
+  }, [currentUser, getUserData, navigate]);
 
   const verifyPayment = async (referenceId) => {
     try {
@@ -65,13 +87,25 @@ const Success = () => {
         return;
       }
 
-      setOrderDetails({
+      const orderData = {
         referenceId,
         paymentStatus: 'Confirmed',
         amount: '₹99',
         date: new Date().toLocaleDateString()
-      });
+      };
+
+      setOrderDetails(orderData);
       setStatus('success');
+
+      // If user is logged in, update their registration record
+      if (currentUser && currentUser.uid) {
+        try {
+          await updateUserRegistration(referenceId, orderData);
+          console.log('User registration updated in Firestore');
+        } catch (error) {
+          console.error('Error updating user registration:', error);
+        }
+      }
     } catch (error) {
       console.error('Error verifying payment:', error);
       // Redirect on error as well
@@ -220,6 +254,15 @@ const Success = () => {
                 >
                   Return to Home
                 </Link>
+                
+                {!currentUser && (
+                  <p className="text-sm text-gray-600 mt-4">
+                    Want to save your registration details?{" "}
+                    <Link to="/register" className="text-violet-600 hover:text-violet-800 font-medium">
+                      Create an account
+                    </Link>
+                  </p>
+                )}
               </div>
             </>
           )}
