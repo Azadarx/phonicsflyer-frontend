@@ -114,16 +114,6 @@ const Navbar = () => {
 
             {/* Mobile navigation area with Home button and hamburger */}
             <div className="sm:hidden flex items-center space-x-4">
-              {/* Home button in mobile nav */}
-              <Link
-                to="/"
-                className={`relative px-2 py-2 text-sm font-medium transition-colors duration-300 ${activeSection === 'home'
-                    ? 'text-violet-600'
-                    : 'text-gray-700'
-                  }`}
-              >
-                Home
-              </Link>
 
               {/* Mobile hamburger button */}
               <button
