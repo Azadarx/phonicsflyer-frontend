@@ -12,12 +12,12 @@ const firebaseConfig = {
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "YOUR_PROJECT_ID.appspot.com",
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "YOUR_APP_ID",
-  measurementId: "G-WYKCQBDQYT"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+console.log(firebaseConfig)
 
 export { auth, db };
