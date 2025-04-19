@@ -32,13 +32,7 @@ function App() {
             <Footer />
           </div>
         } />
-        <Route path="/register" element={
-          <>
-            <Navbar />
-            <RegisterForm />
-            <Footer />
-          </>
-        } />
+        <Route path="/register" element={<RegisterForm />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />
