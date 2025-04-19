@@ -36,12 +36,12 @@ export function AuthProvider({ children }) {
     try {
       setError('');
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      
+      console.log('userCredential', userCredential);
       // Update profile with display name
       await updateProfile(userCredential.user, {
         displayName: fullName
       });
-
+      console.log('updateProfile', updateProfile);
       // Save additional user data to Firestore
       await setDoc(doc(db, 'users', userCredential.user.uid), {
         fullName,
@@ -50,7 +50,7 @@ export function AuthProvider({ children }) {
         createdAt: new Date().toISOString(),
         registrations: []
       });
-
+      console.log('setDoc==', setDoc);
       return userCredential.user;
     } catch (err) {
       console.error("Signup error:", err);
