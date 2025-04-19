@@ -97,8 +97,30 @@ const Navbar = () => {
             </div>
           </div>
           
-          {/* Mobile menu button - now only shows below 400px */}
-          <div className="sm:hidden">
+          {/* Mobile navigation area with Home button and hamburger */}
+          <div className="sm:hidden flex items-center space-x-4">
+            {/* Home button in mobile nav */}
+            <Link 
+              to="/"
+              className={`relative px-2 py-2 text-sm font-medium transition-colors duration-300 ${
+                activeSection === 'home'
+                  ? 'text-violet-600'
+                  : 'text-gray-700 hover:text-violet-500'
+              }`}
+            >
+              Home
+              {activeSection === 'home' && (
+                <motion.span
+                  layoutId="mobileNavUnderline"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-600 to-fuchsia-600"
+                  initial={{ width: 0 }}
+                  animate={{ width: '100%' }}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
+            </Link>
+            
+            {/* Mobile menu button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-violet-600 focus:outline-none"
@@ -127,10 +149,10 @@ const Navbar = () => {
             className="sm:hidden overflow-hidden bg-white shadow-xl"
           >
             <div className="px-4 pt-2 pb-4 space-y-1">
-              {['home', 'about', 'features', 'coaches', 'pricing'].map((item) => (
+              {['about', 'features', 'coaches', 'pricing'].map((item) => (
                 <div key={item}>
                   <a 
-                    href={item === 'home' ? '/' : `#${item}`}
+                    href={`#${item}`}
                     className={`block px-4 py-2 rounded-lg text-base font-medium ${
                       activeSection === item
                         ? 'bg-violet-50 text-violet-600'
