@@ -87,9 +87,15 @@ const Success = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center px-4 py-20">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full text-center">
         {status === 'loading' && (
-          <div className="py-8">
-            <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Verifying your registration...</p>
+          <div className="py-8 flex flex-col items-center justify-center">
+            <div className="relative w-16 h-16 mx-auto mb-4">
+              {/* Main spinner */}
+              <div className="absolute inset-0 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+
+              {/* Inner pulse effect */}
+              <div className="absolute inset-2 rounded-full bg-purple-200 opacity-50 animate-pulse"></div>
+            </div>
+            <p className="text-purple-700">Verifying your registration...</p>
           </div>
         )}
 
