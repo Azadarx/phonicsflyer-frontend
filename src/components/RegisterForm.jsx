@@ -77,7 +77,7 @@ const RegisterForm = () => {
 
       // Save reference ID in session storage for later use
       sessionStorage.setItem('referenceId', referenceId);
-
+      
       // Save user data in session storage for display on success page
       sessionStorage.setItem('userData', JSON.stringify(formData));
 
@@ -91,26 +91,20 @@ const RegisterForm = () => {
       }
 
       // Initialize Razorpay options
-      // In RegisterForm.jsx, update the options object in handleSubmit function:
-
       const options = {
         key: razorpayKey,
-        amount: 100, // amount in paisa (99 INR)
+        amount: 9900, // amount in paisa (99 INR)
         currency: "INR",
         name: "Inspiring Shereen",
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
-        // Add redirect setting for mobile UPI
-        redirect: true,
-        send_sms_hash: true,
-        allow_rotation: true,
         handler: function (response) {
           // Store reference ID in multiple storage methods for redundancy
           sessionStorage.setItem('referenceId', referenceId);
           localStorage.setItem('referenceId', referenceId);
-
+          
           console.log('Payment successful, referenceId:', referenceId);
-
+          
           // Handle successful payment
           const paymentData = {
             razorpay_payment_id: response.razorpay_payment_id,
@@ -118,30 +112,27 @@ const RegisterForm = () => {
             razorpay_signature: response.razorpay_signature,
             referenceId: referenceId
           };
-
+        
           // Verify payment with backend
           axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
             paymentData
           )
-            .then(result => {
-              console.log('Payment confirmation success:', result.data);
-              // Navigate with query parameter as backup
-              navigate(`/success?refId=${referenceId}`);
-            })
-            .catch(err => {
-              console.error("Error confirming payment:", err);
-              // Still navigate to success even if confirmation fails
-              navigate(`/success?refId=${referenceId}`);
-            });
+          .then(result => {
+            console.log('Payment confirmation success:', result.data);
+            // Navigate with query parameter as backup
+            navigate(`/success?refId=${referenceId}`);
+          })
+          .catch(err => {
+            console.error("Error confirming payment:", err);
+            // Still navigate to success even if confirmation fails
+            navigate(`/success?refId=${referenceId}`);
+          });
         },
         prefill: {
           name: formData.fullName,
           email: formData.email,
           contact: formData.phone
-        },
-        notes: {
-          referenceId: referenceId
         },
         theme: {
           color: "#7C3AED" // Violet color to match theme
@@ -150,11 +141,8 @@ const RegisterForm = () => {
           ondismiss: function () {
             setLoading(false);
             console.log('Payment cancelled');
-            navigate(`/payment-failed?refId=${referenceId}&reason=cancelled`);
           }
-        },
-        // Add callback URLs for mobile UPI flow
-        callback_url: `${window.location.origin}/payment-callback`
+        }
       };
 
       // Create Razorpay instance and open payment form
@@ -172,7 +160,7 @@ const RegisterForm = () => {
   return (
     <section id="register" className="relative py-20 overflow-hidden">
       {/* Single animated background element */}
-      <div
+      <div 
         className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-violet-300/30 to-fuchsia-300/30 blur-3xl"
         style={{
           width: '50%',
