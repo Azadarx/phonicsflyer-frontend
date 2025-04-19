@@ -43,13 +43,13 @@ export function AuthProvider({ children }) {
       });
       console.log('updateProfile', updateProfile);
       // Save additional user data to Firestore
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        fullName,
-        email,
-        phone,
-        createdAt: new Date().toISOString(),
-        registrations: []
-      });
+      // await setDoc(doc(db, 'users', userCredential.user.uid), {
+      //   fullName,
+      //   email,
+      //   phone,
+      //   createdAt: new Date().toISOString(),
+      //   registrations: []
+      // });
       console.log('setDoc==', setDoc);
       return userCredential.user;
     } catch (err) {
