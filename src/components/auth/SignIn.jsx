@@ -17,7 +17,7 @@ const SignIn = ({ onClose, switchToSignUp }) => {
       await login(email, password);
       onClose();
     } catch (err) {
-      console.error("Login error:", err);
+      
       // Error is already set in the context
     } finally {
       setIsLoading(false);

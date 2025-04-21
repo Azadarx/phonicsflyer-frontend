@@ -15,6 +15,7 @@ const RegisterForm = () => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success', 'error'
   const navigate = useNavigate();
   const { currentUser, signup, login, updateUserRegistration } = useAuth();
 
@@ -68,52 +69,77 @@ const RegisterForm = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setPaymentStep('processing');
 
     try {
+      
+
       // Step 1: Create an account if user is not logged in
       let user = currentUser;
       if (!user) {
+        
         // Generate a random password for new users
         const tempPassword = Math.random().toString(36).slice(-8);
         try {
           // Try signup first
           user = await signup(formData.email, tempPassword, formData.fullName, formData.phone);
+          
         } catch (signupError) {
           // If email already exists, try login (will fail with wrong password, which is expected)
           if (signupError.code === 'auth/email-already-in-use') {
+            
             try {
               await login(formData.email, '');  // This will fail as we don't know the password
             } catch (loginError) {
               // This is expected to fail but we can continue with registration
-              console.log("User already exists, continuing with registration process");
+              
             }
           } else {
+            
             throw signupError;
           }
         }
       }
 
+      // Get the current authentication token
+      const idToken = currentUser ? await currentUser.getIdToken() : null;
+      const authHeader = idToken ? { Authorization: `Bearer ${idToken}` } : {};
+
       // Step 2: Register the user and get reference ID
-      const registerResponse = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/register`,
-        formData
+      const referenceId = `REF_${Date.now()}`;
+      
+
+      // Save the registration form data in RTDB for Razorpay to use
+      
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/api/user/registrations`,
+        {
+          referenceId,
+          ...formData,
+          timestamp: new Date().toISOString()
+        },
+        {
+          headers: authHeader
+        }
       );
-
-      if (!registerResponse.data.success) {
-        throw new Error('Registration failed');
-      }
-
-      const { referenceId } = registerResponse.data;
+      
 
       // Step 3: Create payment order with Razorpay
+      
       const orderResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
-        { referenceId }
+        { referenceId },
+        {
+          headers: authHeader
+        }
       );
 
       if (!orderResponse.data.success) {
+        
         throw new Error('Failed to create payment order');
       }
+
+      
 
       // Save reference ID in session storage
       sessionStorage.setItem('referenceId', referenceId);
@@ -125,15 +151,18 @@ const RegisterForm = () => {
       const { orderId, razorpayKey } = orderResponse.data;
 
       // Load Razorpay script
+      
       const isScriptLoaded = await loadRazorpayScript();
       if (!isScriptLoaded) {
+        
         throw new Error('Razorpay SDK failed to load');
       }
+      
 
       // Initialize Razorpay options
       const options = {
         key: razorpayKey,
-        amount: 100, // amount in paisa (99 INR)
+        amount: 9900, // amount in paisa (99 INR)
         currency: "INR",
         name: "Inspiring Shereen",
         method: "upi",
@@ -144,7 +173,9 @@ const RegisterForm = () => {
           sessionStorage.setItem('referenceId', referenceId);
           localStorage.setItem('referenceId', referenceId);
 
-          console.log('Payment successful, referenceId:', referenceId);
+          
+          
+          setPaymentStep('success');
 
           // Handle successful payment
           const paymentData = {
@@ -156,15 +187,20 @@ const RegisterForm = () => {
 
           try {
             // Verify payment with backend
+            
             const result = await axios.post(
               `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
-              paymentData
+              paymentData,
+              {
+                headers: authHeader
+              }
             );
 
-            console.log('Payment confirmation success:', result.data);
+            
 
             // Update user's registration data in Firebase if logged in
             if (currentUser) {
+              
               await updateUserRegistration(referenceId, {
                 orderId,
                 paymentId: response.razorpay_payment_id,
@@ -175,10 +211,13 @@ const RegisterForm = () => {
             }
 
             // Navigate with query parameter as backup
-            navigate(`/success?refId=${referenceId}`);
+            
+            navigate(`/success?refId=${referenceId}`);;
           } catch (err) {
-            console.error("Error confirming payment:", err);
+            
             // Still navigate to success even if confirmation fails
+            // This is because Razorpay has already confirmed the payment
+            
             navigate(`/success?refId=${referenceId}`);
           }
         },
@@ -193,19 +232,34 @@ const RegisterForm = () => {
         modal: {
           ondismiss: function () {
             setLoading(false);
-            console.log('Payment cancelled');
+            setPaymentStep('form');
+            
           }
         }
       };
 
       // Create Razorpay instance and open payment form
+      
       const razorpay = new window.Razorpay(options);
       razorpay.open();
 
     } catch (err) {
-      console.error('Registration/payment error:', err);
+      
       setError('An error occurred: ' + (err.response?.data?.error || err.message));
       setLoading(false);
+      setPaymentStep('error');
+
+      // Log error to server for debugging
+      try {
+        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/log-error`, {
+          message: err.message,
+          stack: err.stack,
+          user: currentUser ? { id: currentUser.uid, email: currentUser.email } : null,
+          context: 'payment_flow'
+        });
+      } catch (logError) {
+        
+      }
     }
   };
 
@@ -272,6 +326,26 @@ const RegisterForm = () => {
               </div>
             )}
 
+            {/* Payment step indicators */}
+            {paymentStep === 'processing' && !error && (
+              <div className="mb-6 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm flex items-center">
+                <svg className="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Setting up payment... Please wait.
+              </div>
+            )}
+
+            {paymentStep === 'success' && (
+              <div className="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
+                <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                Payment successful! Redirecting to confirmation page...
+              </div>
+            )}
+
             {/* Decorative elements */}
             <div className="absolute -top-6 -right-6 w-12 h-12 bg-fuchsia-500 rounded-full flex items-center justify-center shadow-lg transform rotate-12">
               <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -303,6 +377,7 @@ const RegisterForm = () => {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-600"
                     placeholder="Your full name"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -325,6 +400,7 @@ const RegisterForm = () => {
                     placeholder="Your email address"
                     required
                     readOnly={currentUser !== null} // Make email readonly if user is logged in
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -346,6 +422,7 @@ const RegisterForm = () => {
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-600"
                     placeholder="Your phone number"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -353,6 +430,13 @@ const RegisterForm = () => {
               {error && (
                 <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
                   {error}
+                  <button
+                    className="block mt-2 text-red-700 underline"
+                    onClick={() => setError('')}
+                    type="button"
+                  >
+                    Try Again
+                  </button>
                 </div>
               )}
 

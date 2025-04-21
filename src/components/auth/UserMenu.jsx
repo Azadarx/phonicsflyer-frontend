@@ -7,17 +7,17 @@ const UserMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userData, setUserData] = useState(null);
   const dropdownRef = useRef(null);
-  const { currentUser, logout, getUserData } = useAuth();
+  const { currentUser, logout, getUserData, isAdmin } = useAuth();
   
   useEffect(() => {
-    // Fetch user data from Firestore when user is authenticated
+    // Fetch user data from API when user is authenticated
     const fetchUserData = async () => {
       if (currentUser?.uid) {
         try {
           const data = await getUserData(currentUser.uid);
           setUserData(data);
         } catch (err) {
-          console.error("Error fetching user data:", err);
+          
         }
       }
     };
@@ -44,7 +44,7 @@ const UserMenu = () => {
       await logout();
       setIsOpen(false);
     } catch (err) {
-      console.error("Logout error:", err);
+      
     }
   };
   
@@ -80,6 +80,11 @@ const UserMenu = () => {
             <div className="p-4 border-b border-gray-100">
               <p className="font-medium text-gray-800">{currentUser?.displayName || "User"}</p>
               <p className="text-sm text-gray-500 truncate">{currentUser?.email}</p>
+              {isAdmin && (
+                <span className="inline-block px-2 py-1 mt-1 text-xs font-medium text-white bg-violet-600 rounded-full">
+                  Admin
+                </span>
+              )}
             </div>
             
             <div className="py-2">
@@ -93,19 +98,6 @@ const UserMenu = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   My Profile
-                </div>
-              </Link>
-              
-              <Link
-                to="/my-registrations"
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 mr-3 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                  My Registrations
                 </div>
               </Link>
               

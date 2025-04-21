@@ -19,7 +19,7 @@ const Profile = () => {
           setUserData(data);
           setRegistrations(data?.registrations || []);
         } catch (err) {
-          console.error("Error fetching user data:", err);
+          
         } finally {
           setLoading(false);
         }

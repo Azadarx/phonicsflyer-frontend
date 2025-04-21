@@ -7,7 +7,7 @@ import Footer from './Footer';
 import { useAuth } from '../contexts/AuthContext';
 
 const Success = () => {
-  console.log('Success component rendering');
+  
   const [status, setStatus] = useState('loading');
   const [orderDetails, setOrderDetails] = useState({});
   const [userData, setUserData] = useState({
@@ -19,14 +19,14 @@ const Success = () => {
   const { currentUser, getUserData, updateUserRegistration } = useAuth();
 
   useEffect(() => {
-    console.log('Success useEffect running');
+    
 
     // Get reference ID from multiple possible sources
     const referenceId = sessionStorage.getItem('referenceId') ||
       localStorage.getItem('referenceId') ||
       new URLSearchParams(window.location.search).get('refId');
 
-    console.log('Reference ID found:', referenceId);
+    
 
     const fetchData = async () => {
       // Try to get user data from auth context first if user is logged in
@@ -41,7 +41,7 @@ const Success = () => {
             });
           }
         } catch (error) {
-          console.error('Error fetching authenticated user data:', error);
+          
         }
       } else {
         // Fall back to session storage if not logged in
@@ -51,15 +51,15 @@ const Success = () => {
             setUserData(JSON.parse(storedUserData));
           }
         } catch (e) {
-          console.error('Error parsing user data:', e);
+          
         }
       }
     };
-    
+
     fetchData();
 
     if (!referenceId) {
-      console.warn('No reference ID found - redirecting to home page');
+      
       navigate('/');
       return;
     }
@@ -74,15 +74,23 @@ const Success = () => {
 
   const verifyPayment = async (referenceId) => {
     try {
-      console.log('Verifying payment for:', referenceId);
+      
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/check-payment?reference_id=${referenceId}`;
-      console.log('API URL:', apiUrl);
+      
 
-      const response = await axios.get(apiUrl);
-      console.log('Payment verification response:', response.data);
+      const headers = {};
+
+      if (currentUser) {
+        const token = await currentUser.getIdToken();
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await axios.get(apiUrl, { headers });
+
+      
 
       if (!response.data.success) {
-        console.warn('Payment verification failed - redirecting to home page');
+        
         navigate('/');
         return;
       }
@@ -101,13 +109,13 @@ const Success = () => {
       if (currentUser && currentUser.uid) {
         try {
           await updateUserRegistration(referenceId, orderData);
-          console.log('User registration updated in Firestore');
+          
         } catch (error) {
-          console.error('Error updating user registration:', error);
+          
         }
       }
     } catch (error) {
-      console.error('Error verifying payment:', error);
+      
       // Redirect on error as well
       navigate('/');
     }
@@ -115,7 +123,7 @@ const Success = () => {
 
   // Fallback for blank screen - render something no matter what
   if (document.body.childElementCount <= 1) {
-    console.log('Applying emergency rendering fix');
+    
     document.body.style.backgroundColor = '#8b5cf6';
   }
 
@@ -254,7 +262,7 @@ const Success = () => {
                 >
                   Return to Home
                 </Link>
-                
+
                 {!currentUser && (
                   <p className="text-sm text-gray-600 mt-4">
                     Want to save your registration details?{" "}
@@ -268,7 +276,7 @@ const Success = () => {
           )}
         </div>
       </div>
-      <Footer/>
+      <Footer />
     </>
   );
 };

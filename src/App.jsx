@@ -15,6 +15,7 @@ import ContactUs from './components/ContactUs';
 import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
 import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
+import Profile from './components/Profile';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
           </div>
         } />
         <Route path="/register" element={<RegisterForm />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />

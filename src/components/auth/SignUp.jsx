@@ -34,7 +34,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
       await signup(formData.email, formData.password, formData.fullName, formData.phone);
       onClose();
     } catch (err) {
-      console.error("Signup error:", err);
+      
       // Error is already set in the context
     } finally {
       setIsLoading(false);
@@ -67,10 +67,10 @@ const SignUp = ({ onClose, switchToSignIn }) => {
         </div>
         
         <div className="mb-4">
-          <label htmlFor="email" className="block text-gray-700 font-medium mb-2">Email</label>
+          <label htmlFor="signupEmail" className="block text-gray-700 font-medium mb-2">Email</label>
           <input
             type="email"
-            id="email"
+            id="signupEmail"
             name="email"
             value={formData.email}
             onChange={handleChange}
