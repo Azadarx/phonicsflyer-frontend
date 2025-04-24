@@ -96,6 +96,17 @@ const Success = () => {
       setStatus('success');
       setPaymentVerified(true);
 
+      // ADD THIS CODE HERE - Retrieve user data from sessionStorage
+      const storedUserData = sessionStorage.getItem('userData');
+      if (storedUserData) {
+        try {
+          const parsedUserData = JSON.parse(storedUserData);
+          setUserData(parsedUserData);
+        } catch (error) {
+          console.error("Error parsing stored user data:", error);
+        }
+      }
+
       // If user is logged in, update their registration record
       if (currentUser && currentUser.uid) {
         try {
