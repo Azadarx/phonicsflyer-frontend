@@ -1,7 +1,7 @@
 // src/components/RegisterForm.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -25,7 +25,11 @@ const RegisterForm = () => {
   // If not logged in, redirect to auth page or show auth modal
   useEffect(() => {
     if (!currentUser) {
-      setShowAuthModal(true);
+      // Only show the auth modal on initial load if user navigated directly to register page
+      // Don't show it automatically if user clicked "Enroll Now" (that will be handled by the button click)
+      if (window.location.pathname === '/register') {
+        setShowAuthModal(true);
+      }
     } else {
       setShowAuthModal(false);
       // Pre-fill form with user data if logged in
@@ -85,7 +89,7 @@ const RegisterForm = () => {
     // Ensure user is authenticated
     if (!currentUser) {
       setShowAuthModal(true);
-      return;
+      return; // Exit early - don't start payment process
     }
 
     setLoading(true);
@@ -477,7 +481,20 @@ const RegisterForm = () => {
       <Footer />
       
       {/* Auth Modal for handling user authentication */}
-      <AuthModal isOpen={showAuthModal} onClose={handleAuthModalClose} />
+      <AnimatePresence>
+        {showAuthModal && (
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => {
+              setShowAuthModal(false);
+              // Only redirect if user explicitly closed modal without signing in
+              if (!currentUser) {
+                navigate('/');
+              }
+            }}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };
