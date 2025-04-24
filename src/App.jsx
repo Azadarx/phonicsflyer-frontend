@@ -15,6 +15,7 @@ import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
 import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 import Profile from './components/Profile';
+import AuthFlowHandler from './components/auth/AuthFlowHandler';
 
 function App() {
   return (
@@ -33,7 +34,14 @@ function App() {
             <Footer />
           </div>
         } />
-        <Route path="/register" element={<RegisterForm />} />
+        {/* Update the register route to use AuthFlowHandler */}
+        <Route path="/register" element={
+          <>
+            <Navbar />
+            <AuthFlowHandler />
+            <Footer />
+          </>
+        } />
         <Route path="/profile" element={<Profile />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
