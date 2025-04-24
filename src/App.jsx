@@ -17,10 +17,16 @@ import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 import Profile from './components/Profile';
 import AuthModal from './components/auth/AuthModal';
 
-// ✅ Add this wrapper component
+
+// This component should be added to your App.jsx
 const AuthPage = () => {
   const navigate = useNavigate();
-  return <AuthModal isOpen={true} onClose={() => navigate('/')} />;
+  
+  const handleClose = () => {
+    navigate('/');
+  };
+  
+  return <AuthModal isOpen={true} onClose={handleClose} />;
 };
 
 function App() {
