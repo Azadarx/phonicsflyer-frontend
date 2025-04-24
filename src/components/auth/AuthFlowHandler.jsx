@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import AuthModal from './auth/AuthModal';
-import RegisterForm from './RegisterForm';
+import { useAuth } from '../../contexts/AuthContext';
+import AuthModal from './AuthModal';
+import RegisterForm from '../RegisterForm';
 
 const AuthFlowHandler = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
