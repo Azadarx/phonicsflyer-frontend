@@ -15,18 +15,24 @@ const Success = () => {
     email: '',
     phone: ''
   });
+  const [paymentVerified, setPaymentVerified] = useState(false);
   const navigate = useNavigate();
   const { currentUser, getUserData, updateUserRegistration } = useAuth();
 
   useEffect(() => {
+    // Check if the page is being accessed directly without a successful payment
+    const isPaymentSuccessful = sessionStorage.getItem('paymentSuccessful') === 'true';
     
-
     // Get reference ID from multiple possible sources
     const referenceId = sessionStorage.getItem('referenceId') ||
       localStorage.getItem('referenceId') ||
       new URLSearchParams(window.location.search).get('refId');
 
-    
+    // If no payment success flag or no reference ID, redirect to home
+    if (!isPaymentSuccessful || !referenceId) {
+      navigate('/');
+      return;
+    }
 
     const fetchData = async () => {
       // Try to get user data from auth context first if user is logged in
@@ -41,7 +47,7 @@ const Success = () => {
             });
           }
         } catch (error) {
-          
+          // Silent fail
         }
       } else {
         // Fall back to session storage if not logged in
@@ -51,22 +57,12 @@ const Success = () => {
             setUserData(JSON.parse(storedUserData));
           }
         } catch (e) {
-          
+          // Silent fail
         }
       }
     };
 
     fetchData();
-
-    if (!referenceId) {
-      
-      navigate('/');
-      return;
-    }
-
-    // Store in both storage methods for redundancy
-    sessionStorage.setItem('referenceId', referenceId);
-    localStorage.setItem('referenceId', referenceId);
 
     // Verify the payment with the backend
     verifyPayment(referenceId);
@@ -74,10 +70,8 @@ const Success = () => {
 
   const verifyPayment = async (referenceId) => {
     try {
-      
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/check-payment?reference_id=${referenceId}`;
       
-
       const headers = {};
 
       if (currentUser) {
@@ -87,10 +81,9 @@ const Success = () => {
 
       const response = await axios.get(apiUrl, { headers });
 
-      
-
       if (!response.data.success) {
-        
+        // Clear payment flag and navigate away
+        sessionStorage.removeItem('paymentSuccessful');
         navigate('/');
         return;
       }
@@ -104,26 +97,30 @@ const Success = () => {
 
       setOrderDetails(orderData);
       setStatus('success');
+      setPaymentVerified(true);
 
       // If user is logged in, update their registration record
       if (currentUser && currentUser.uid) {
         try {
           await updateUserRegistration(referenceId, orderData);
-          
         } catch (error) {
-          
+          // Silent fail
         }
       }
     } catch (error) {
-      
-      // Redirect on error as well
+      // Clear payment flag and redirect on error
+      sessionStorage.removeItem('paymentSuccessful');
       navigate('/');
     }
   };
 
+  // Handle home button click to clear payment success flag
+  const handleHomeClick = () => {
+    sessionStorage.removeItem('paymentSuccessful');
+  };
+
   // Fallback for blank screen - render something no matter what
   if (document.body.childElementCount <= 1) {
-    
     document.body.style.backgroundColor = '#8b5cf6';
   }
 
@@ -145,7 +142,7 @@ const Success = () => {
             </div>
           )}
 
-          {status === 'success' && (
+          {status === 'success' && paymentVerified && (
             <>
               <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,6 +255,7 @@ const Success = () => {
               <div className="space-y-4">
                 <Link
                   to="/"
+                  onClick={handleHomeClick}
                   className="block w-full bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-medium transition-colors duration-200"
                 >
                   Return to Home
