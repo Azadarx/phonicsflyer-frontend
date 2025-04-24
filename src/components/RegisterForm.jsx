@@ -102,9 +102,14 @@ const RegisterForm = () => {
       }
 
       // Get the current authentication token
-      const idToken = currentUser ? await currentUser.getIdToken() : null;
+      let idToken = null;
+      if (!user && currentUser) {
+        idToken = await currentUser.getIdToken();
+      } else if (user) {
+        idToken = await user.getIdToken();
+      }
       const authHeader = idToken ? { Authorization: `Bearer ${idToken}` } : {};
-
+      console.log("authHeader", authHeader);
       // Step 2: Register the user and get reference ID
       const referenceId = `REF_${Date.now()}`;
 
