@@ -1,11 +1,12 @@
 // src/components/RegisterForm.jsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useAuth } from '../contexts/AuthContext';
+import AuthModal from './auth/AuthModal';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -16,37 +17,34 @@ const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success', 'error'
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const navigate = useNavigate();
   const { currentUser, updateUserRegistration } = useAuth();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-  // Redirect if not logged in
+  // If not logged in, redirect to auth page or show auth modal
   useEffect(() => {
     if (!currentUser) {
-      return (
-        <>
-          <Navbar />
-          <div className="min-h-screen flex items-center justify-center text-center text-lg text-gray-700">
-            Please sign in to register for the class.
-          </div>
-          <Footer />
-        </>
-      );
-    }
-  }, [currentUser, navigate]);
-
-  // Pre-fill form with user data if logged in
-  useEffect(() => {
-    if (currentUser) {
-      // Get user data from auth context
-      const userData = {
+      setShowAuthModal(true);
+    } else {
+      setShowAuthModal(false);
+      // Pre-fill form with user data if logged in
+      setFormData({
         fullName: currentUser.displayName || formData.fullName,
         email: currentUser.email || formData.email,
         phone: formData.phone // Phone may need to be fetched from Firestore
-      };
-      setFormData(userData);
+      });
     }
   }, [currentUser]);
+
+  // Handle auth modal close
+  const handleAuthModalClose = () => {
+    setShowAuthModal(false);
+    if (!currentUser) {
+      // If user still not authenticated after modal closes, redirect to home
+      navigate('/');
+    }
+  };
 
   // Simplified animation variants
   const formVariants = {
@@ -86,7 +84,7 @@ const RegisterForm = () => {
 
     // Ensure user is authenticated
     if (!currentUser) {
-      navigate('/auth', { state: { returnUrl: '/register' } });
+      setShowAuthModal(true);
       return;
     }
 
@@ -253,6 +251,11 @@ const RegisterForm = () => {
     );
     return response.data;
   };
+
+  // If user is not authenticated and auth modal is not showing, redirect to home
+  if (!currentUser && !showAuthModal) {
+    return <Navigate to="/" />;
+  }
 
   return (
     <>
@@ -472,6 +475,9 @@ const RegisterForm = () => {
         </div>
       </section>
       <Footer />
+      
+      {/* Auth Modal for handling user authentication */}
+      <AuthModal isOpen={showAuthModal} onClose={handleAuthModalClose} />
     </>
   );
 };
