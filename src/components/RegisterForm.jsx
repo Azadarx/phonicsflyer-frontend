@@ -23,7 +23,15 @@ const RegisterForm = () => {
   // Redirect if not logged in
   useEffect(() => {
     if (!currentUser) {
-      navigate('/auth', { state: { returnUrl: '/register' } });
+      return (
+        <>
+          <Navbar />
+          <div className="min-h-screen flex items-center justify-center text-center text-lg text-gray-700">
+            Please sign in to register for the class.
+          </div>
+          <Footer />
+        </>
+      );
     }
   }, [currentUser, navigate]);
 
@@ -75,13 +83,13 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Ensure user is authenticated
     if (!currentUser) {
       navigate('/auth', { state: { returnUrl: '/register' } });
       return;
     }
-    
+
     setLoading(true);
     setError('');
     setPaymentStep('processing');
@@ -90,7 +98,7 @@ const RegisterForm = () => {
       // Get the current authentication token
       const idToken = await currentUser.getIdToken(true); // Force refresh to ensure token is valid
       const authHeader = { Authorization: `Bearer ${idToken}` };
-      
+
       // Step 1: Save registration data in RTDB
       await axios.post(
         `${API_BASE_URL}/api/user/registrations`,
@@ -136,7 +144,7 @@ const RegisterForm = () => {
         handler: async function (response) {
           try {
             setPaymentStep('success');
-            
+
             // Handle successful payment
             const paymentData = {
               razorpay_payment_id: response.razorpay_payment_id,
@@ -176,7 +184,7 @@ const RegisterForm = () => {
             } catch (statusError) {
               console.error("Error checking payment status:", statusError);
             }
-            
+
             setError("Payment was processed but confirmation failed. Please contact support.");
             setPaymentStep('error');
             setLoading(false);
@@ -194,14 +202,14 @@ const RegisterForm = () => {
           ondismiss: function () {
             setLoading(false);
             setPaymentStep('form');
-            
+
             // Check if payment was successful despite modal being closed
             setTimeout(async () => {
               try {
                 const idToken = await currentUser.getIdToken(true);
                 const authHeader = { Authorization: `Bearer ${idToken}` };
                 const paymentStatus = await checkPaymentStatus(authHeader);
-                
+
                 if (paymentStatus.success) {
                   navigate('/success');
                 }
