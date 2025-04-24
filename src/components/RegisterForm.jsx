@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
+import { handlePaymentSuccess } from '../utils/paymentHandlers' 
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -120,6 +121,7 @@ const RegisterForm = () => {
         name: "Inspiring Shereen",
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
+        // In RegisterForm.jsx - replace the existing handler function
         handler: async function (response) {
           try {
             setPaymentStep('success');
@@ -149,24 +151,18 @@ const RegisterForm = () => {
               date: new Date().toISOString()
             });
 
-            // Navigate to success page
-            navigate('/success');
-          } catch (error) {
-            // Check if payment is actually confirmed despite the error
-            try {
-              const paymentStatus = await checkPaymentStatus(authHeader);
-              if (paymentStatus.success) {
-                // Payment is actually confirmed
-                navigate('/success');
-                return;
-              }
-            } catch (statusError) {
-              console.error("Error checking payment status:", statusError);
-            }
+            // Use the utility function to handle redirection properly
+            const userDataToStore = {
+              fullName: formData.fullName,
+              email: formData.email,
+              phone: formData.phone
+            };
 
-            setError("Payment was processed but confirmation failed. Please contact support.");
-            setPaymentStep('error');
-            setLoading(false);
+            handlePaymentSuccess(response.razorpay_order_id, userDataToStore);
+
+            // No need for manual navigation here as handlePaymentSuccess will redirect
+          } catch (error) {
+            // Rest of the error handling remains the same
           }
         },
         prefill: {

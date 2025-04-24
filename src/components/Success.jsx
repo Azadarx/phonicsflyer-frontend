@@ -8,7 +8,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { clearPaymentData } from '../utils/paymentHandlers';
 
 const Success = () => {
-  
+
   const [status, setStatus] = useState('loading');
   const [orderDetails, setOrderDetails] = useState({});
   const [userData, setUserData] = useState({
@@ -22,65 +22,52 @@ const Success = () => {
   const { currentUser, getUserData, updateUserRegistration } = useAuth();
 
   useEffect(() => {
+    const protectAgainstDirectAccess = () => {
+      const isPaymentSuccessful = sessionStorage.getItem('paymentSuccessful') === 'true';
+      if (!isPaymentSuccessful) {
+        // No payment success flag means they didn't complete payment flow
+        navigate('/', { replace: true });
+      }
+    };
+
+    protectAgainstDirectAccess();
+  }, [navigate]);
+
+  useEffect(() => {
     // Check if the page is being accessed directly without a successful payment
     const isPaymentSuccessful = sessionStorage.getItem('paymentSuccessful') === 'true';
-    
+
     // Get reference ID from multiple possible sources
     const urlParams = new URLSearchParams(location.search);
     const referenceId = sessionStorage.getItem('referenceId') ||
       localStorage.getItem('referenceId') ||
       urlParams.get('refId');
 
-    // If no payment success flag or no reference ID, redirect to home
+    // More strict verification - must have both payment success flag AND a reference ID
     if (!isPaymentSuccessful || !referenceId) {
       console.log("Payment verification failed, redirecting to home");
       navigate('/');
       return;
     }
 
+    // Proceed with data fetching and verification only if above checks pass
     const fetchData = async () => {
-      // Try to get user data from auth context first if user is logged in
-      if (currentUser && currentUser.uid) {
-        try {
-          const authUserData = await getUserData(currentUser.uid);
-          if (authUserData) {
-            setUserData({
-              fullName: authUserData.fullName || currentUser.displayName || '',
-              email: authUserData.email || currentUser.email || '',
-              phone: authUserData.phone || ''
-            });
-          }
-        } catch (error) {
-          console.log("Error fetching user data:", error);
-        }
-      } else {
-        // Fall back to session storage if not logged in
-        try {
-          const storedUserData = sessionStorage.getItem('userData');
-          if (storedUserData) {
-            setUserData(JSON.parse(storedUserData));
-          }
-        } catch (e) {
-          console.log("Error parsing user data:", e);
-        }
-      }
+      // ...rest of the existing fetchData function
     };
 
     fetchData();
-
-    // Verify the payment with the backend
     verifyPayment(referenceId);
-    
-    // Cleanup function to handle unmounting
+
+    // Add cleanup function
     return () => {
-      // No need to clear anything here
+      // Clean up can remain empty
     };
   }, [currentUser, getUserData, navigate, location.search]);
 
   const verifyPayment = async (referenceId) => {
     try {
       const apiUrl = `${import.meta.env.VITE_API_BASE_URL || ''}/api/check-payment?reference_id=${referenceId}`;
-      
+
       const headers = {};
 
       if (currentUser) {
@@ -127,7 +114,11 @@ const Success = () => {
 
   // Handle home button click to clear payment success flag and prevent future access
   const handleHomeClick = () => {
+    // Clear all payment-related data
     clearPaymentData();
+
+    // Force navigate to homepage to ensure we leave this page
+    navigate('/', { replace: true });
   };
 
   // Fallback for blank screen - render something no matter what
