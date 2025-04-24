@@ -72,30 +72,30 @@ const RegisterForm = () => {
     setPaymentStep('processing');
 
     try {
-      
+
 
       // Step 1: Create an account if user is not logged in
       let user = currentUser;
       if (!user) {
-        
+
         // Generate a random password for new users
         const tempPassword = Math.random().toString(36).slice(-8);
         try {
           // Try signup first
           user = await signup(formData.email, tempPassword, formData.fullName, formData.phone);
-          
+
         } catch (signupError) {
           // If email already exists, try login (will fail with wrong password, which is expected)
           if (signupError.code === 'auth/email-already-in-use') {
-            
+
             try {
               await login(formData.email, '');  // This will fail as we don't know the password
             } catch (loginError) {
               // This is expected to fail but we can continue with registration
-              
+
             }
           } else {
-            
+
             throw signupError;
           }
         }
@@ -107,10 +107,10 @@ const RegisterForm = () => {
 
       // Step 2: Register the user and get reference ID
       const referenceId = `REF_${Date.now()}`;
-      
+
 
       // Save the registration form data in RTDB for Razorpay to use
-      
+
       await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/user/registrations`,
         {
@@ -122,10 +122,10 @@ const RegisterForm = () => {
           headers: authHeader
         }
       );
-      
+
 
       // Step 3: Create payment order with Razorpay
-      
+
       const orderResponse = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
         { referenceId },
@@ -135,11 +135,11 @@ const RegisterForm = () => {
       );
 
       if (!orderResponse.data.success) {
-        
+
         throw new Error('Failed to create payment order');
       }
 
-      
+
 
       // Save reference ID in session storage
       sessionStorage.setItem('referenceId', referenceId);
@@ -151,13 +151,13 @@ const RegisterForm = () => {
       const { orderId, razorpayKey } = orderResponse.data;
 
       // Load Razorpay script
-      
+
       const isScriptLoaded = await loadRazorpayScript();
       if (!isScriptLoaded) {
-        
+
         throw new Error('Razorpay SDK failed to load');
       }
-      
+
 
       // Initialize Razorpay options
       const options = {
@@ -173,8 +173,8 @@ const RegisterForm = () => {
           sessionStorage.setItem('referenceId', referenceId);
           localStorage.setItem('referenceId', referenceId);
 
-          
-          
+
+
           setPaymentStep('success');
 
           // Handle successful payment
@@ -187,7 +187,7 @@ const RegisterForm = () => {
 
           try {
             // Verify payment with backend
-            
+
             const result = await axios.post(
               `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
               paymentData,
@@ -196,11 +196,11 @@ const RegisterForm = () => {
               }
             );
 
-            
+
 
             // Update user's registration data in Firebase if logged in
             if (currentUser) {
-              
+
               await updateUserRegistration(referenceId, {
                 orderId,
                 paymentId: response.razorpay_payment_id,
@@ -211,13 +211,13 @@ const RegisterForm = () => {
             }
 
             // Navigate with query parameter as backup
-            
+
             navigate(`/success?refId=${referenceId}`);;
           } catch (err) {
-            
+
             // Still navigate to success even if confirmation fails
             // This is because Razorpay has already confirmed the payment
-            
+
             navigate(`/success?refId=${referenceId}`);
           }
         },
@@ -233,18 +233,18 @@ const RegisterForm = () => {
           ondismiss: function () {
             setLoading(false);
             setPaymentStep('form');
-            
+
           }
         }
       };
 
       // Create Razorpay instance and open payment form
-      
+
       const razorpay = new window.Razorpay(options);
       razorpay.open();
 
     } catch (err) {
-      
+
       setError('An error occurred: ' + (err.response?.data?.error || err.message));
       setLoading(false);
       setPaymentStep('error');
@@ -258,7 +258,7 @@ const RegisterForm = () => {
           context: 'payment_flow'
         });
       } catch (logError) {
-        
+
       }
     }
   };
