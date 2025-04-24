@@ -1,10 +1,11 @@
 // src/components/Success.jsx
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { useAuth } from '../contexts/AuthContext';
+import { clearPaymentData } from '../utils/paymentHandlers';
 
 const Success = () => {
   
@@ -17,6 +18,7 @@ const Success = () => {
   });
   const [paymentVerified, setPaymentVerified] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentUser, getUserData, updateUserRegistration } = useAuth();
 
   useEffect(() => {
@@ -24,12 +26,14 @@ const Success = () => {
     const isPaymentSuccessful = sessionStorage.getItem('paymentSuccessful') === 'true';
     
     // Get reference ID from multiple possible sources
+    const urlParams = new URLSearchParams(location.search);
     const referenceId = sessionStorage.getItem('referenceId') ||
       localStorage.getItem('referenceId') ||
-      new URLSearchParams(window.location.search).get('refId');
+      urlParams.get('refId');
 
     // If no payment success flag or no reference ID, redirect to home
     if (!isPaymentSuccessful || !referenceId) {
+      console.log("Payment verification failed, redirecting to home");
       navigate('/');
       return;
     }
@@ -47,7 +51,7 @@ const Success = () => {
             });
           }
         } catch (error) {
-          // Silent fail
+          console.log("Error fetching user data:", error);
         }
       } else {
         // Fall back to session storage if not logged in
@@ -57,7 +61,7 @@ const Success = () => {
             setUserData(JSON.parse(storedUserData));
           }
         } catch (e) {
-          // Silent fail
+          console.log("Error parsing user data:", e);
         }
       }
     };
@@ -66,7 +70,12 @@ const Success = () => {
 
     // Verify the payment with the backend
     verifyPayment(referenceId);
-  }, [currentUser, getUserData, navigate]);
+    
+    // Cleanup function to handle unmounting
+    return () => {
+      // No need to clear anything here
+    };
+  }, [currentUser, getUserData, navigate, location.search]);
 
   const verifyPayment = async (referenceId) => {
     try {
@@ -81,9 +90,10 @@ const Success = () => {
 
       const response = await axios.get(apiUrl, { headers });
 
-      if (!response.data.success) {
+      if (!response.data || !response.data.success) {
+        console.log("Payment verification API returned unsuccessful");
         // Clear payment flag and navigate away
-        sessionStorage.removeItem('paymentSuccessful');
+        clearPaymentData();
         navigate('/');
         return;
       }
@@ -104,19 +114,20 @@ const Success = () => {
         try {
           await updateUserRegistration(referenceId, orderData);
         } catch (error) {
-          // Silent fail
+          console.log("Error updating user registration:", error);
         }
       }
     } catch (error) {
+      console.error("Error verifying payment:", error);
       // Clear payment flag and redirect on error
-      sessionStorage.removeItem('paymentSuccessful');
+      clearPaymentData();
       navigate('/');
     }
   };
 
-  // Handle home button click to clear payment success flag
+  // Handle home button click to clear payment success flag and prevent future access
   const handleHomeClick = () => {
-    sessionStorage.removeItem('paymentSuccessful');
+    clearPaymentData();
   };
 
   // Fallback for blank screen - render something no matter what
