@@ -1,13 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
 
 const AuthModal = ({ isOpen, onClose }) => {
   const [showSignIn, setShowSignIn] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
   
   const modalVariants = {
     hidden: { opacity: 0 },
@@ -19,19 +16,10 @@ const AuthModal = ({ isOpen, onClose }) => {
     visible: { y: 0, opacity: 1, transition: { delay: 0.2 } }
   };
 
-  const handleClose = () => {
-    // If we're on the /auth route, navigate to home
-    if (location.pathname === '/auth') {
-      navigate('/');
-    }
-    // Always call the provided onClose function
-    if (onClose) onClose();
-  };
-
   // Handle clicks outside the modal
   const handleOutsideClick = (e) => {
     if (e.target === e.currentTarget) {
-      handleClose();
+      onClose();
     }
   };
   
@@ -53,7 +41,7 @@ const AuthModal = ({ isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 z-10"
           >
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,9 +50,9 @@ const AuthModal = ({ isOpen, onClose }) => {
           </button>
           
           {showSignIn ? (
-            <SignIn onClose={handleClose} switchToSignUp={() => setShowSignIn(false)} />
+            <SignIn onClose={onClose} switchToSignUp={() => setShowSignIn(false)} />
           ) : (
-            <SignUp onClose={handleClose} switchToSignIn={() => setShowSignIn(true)} />
+            <SignUp onClose={onClose} switchToSignIn={() => setShowSignIn(true)} />
           )}
         </motion.div>
       </motion.div>

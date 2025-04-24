@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -15,19 +15,6 @@ import TermsAndConditions from './components/TermsAndConditions';
 import RefundAndCancellation from './components/RefundAndCancellation';
 import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 import Profile from './components/Profile';
-import AuthModal from './components/auth/AuthModal';
-
-
-// This component should be added to your App.jsx
-const AuthPage = () => {
-  const navigate = useNavigate();
-  
-  const handleClose = () => {
-    navigate('/');
-  };
-  
-  return <AuthModal isOpen={true} onClose={handleClose} />;
-};
 
 function App() {
   return (
@@ -47,7 +34,6 @@ function App() {
           </div>
         } />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/auth" element={<AuthPage />} /> {/* ✅ FIXED */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/ContactUs" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
