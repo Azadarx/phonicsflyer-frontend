@@ -17,7 +17,15 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success', 'error'
   const navigate = useNavigate();
-  const { currentUser, signup, login, updateUserRegistration } = useAuth();
+  const { currentUser, updateUserRegistration } = useAuth();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/auth', { state: { returnUrl: '/register' } });
+    }
+  }, [currentUser, navigate]);
 
   // Pre-fill form with user data if logged in
   useEffect(() => {
@@ -67,59 +75,26 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Ensure user is authenticated
+    if (!currentUser) {
+      navigate('/auth', { state: { returnUrl: '/register' } });
+      return;
+    }
+    
     setLoading(true);
     setError('');
     setPaymentStep('processing');
 
     try {
-
-
-      // Step 1: Create an account if user is not logged in
-      let user = currentUser;
-      if (!user) {
-
-        // Generate a random password for new users
-        const tempPassword = Math.random().toString(36).slice(-8);
-        try {
-          // Try signup first
-          user = await signup(formData.email, tempPassword, formData.fullName, formData.phone);
-
-        } catch (signupError) {
-          // If email already exists, try login (will fail with wrong password, which is expected)
-          if (signupError.code === 'auth/email-already-in-use') {
-
-            try {
-              await login(formData.email, '');  // This will fail as we don't know the password
-            } catch (loginError) {
-              // This is expected to fail but we can continue with registration
-
-            }
-          } else {
-
-            throw signupError;
-          }
-        }
-      }
-
       // Get the current authentication token
-      let idToken = null;
-      if (!user && currentUser) {
-        idToken = await currentUser.getIdToken();
-      } else if (user) {
-        idToken = await user.getIdToken();
-      }
-      const authHeader = idToken ? { Authorization: `Bearer ${idToken}` } : {};
-      console.log("authHeader", authHeader);
-      // Step 2: Register the user and get reference ID
-      const referenceId = `REF_${Date.now()}`;
-
-
-      // Save the registration form data in RTDB for Razorpay to use
-
+      const idToken = await currentUser.getIdToken(true); // Force refresh to ensure token is valid
+      const authHeader = { Authorization: `Bearer ${idToken}` };
+      
+      // Step 1: Save registration data in RTDB
       await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/user/registrations`,
+        `${API_BASE_URL}/api/user/registrations`,
         {
-          referenceId,
           ...formData,
           timestamp: new Date().toISOString()
         },
@@ -128,102 +103,83 @@ const RegisterForm = () => {
         }
       );
 
-
-      // Step 3: Create payment order with Razorpay
-
+      // Step 2: Create payment order with Razorpay
       const orderResponse = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/api/create-payment-order`,
-        { referenceId },
+        `${API_BASE_URL}/api/create-payment-order`,
+        {},  // Empty body as server will get user info from Firebase
         {
           headers: authHeader
         }
       );
 
       if (!orderResponse.data.success) {
-
-        throw new Error('Failed to create payment order');
+        throw new Error(orderResponse.data.error || 'Failed to create payment order');
       }
-
-
-
-      // Save reference ID in session storage
-      sessionStorage.setItem('referenceId', referenceId);
-
-      // Save user data in session storage
-      sessionStorage.setItem('userData', JSON.stringify(formData));
 
       // Get order ID and key from the response
       const { orderId, razorpayKey } = orderResponse.data;
 
-      // Load Razorpay script
-
+      // Step 3: Load Razorpay script if not already loaded
       const isScriptLoaded = await loadRazorpayScript();
       if (!isScriptLoaded) {
-
         throw new Error('Razorpay SDK failed to load');
       }
 
-
-      // Initialize Razorpay options
+      // Step 4: Initialize Razorpay options
       const options = {
         key: razorpayKey,
         amount: 9900, // amount in paisa (99 INR)
         currency: "INR",
         name: "Inspiring Shereen",
-        method: "upi",
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
         handler: async function (response) {
-          // Store reference ID in multiple storage methods for redundancy
-          sessionStorage.setItem('referenceId', referenceId);
-          localStorage.setItem('referenceId', referenceId);
-
-
-
-          setPaymentStep('success');
-
-          // Handle successful payment
-          const paymentData = {
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-            referenceId: referenceId
-          };
-
           try {
-            // Verify payment with backend
+            setPaymentStep('success');
+            
+            // Handle successful payment
+            const paymentData = {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature
+            };
 
-            const result = await axios.post(
-              `${import.meta.env.VITE_API_BASE_URL}/api/confirm-payment`,
+            // Verify payment with backend
+            await axios.post(
+              `${API_BASE_URL}/api/confirm-payment`,
               paymentData,
               {
                 headers: authHeader
               }
             );
 
+            // Update user's registration data in context (client-side)
+            await updateUserRegistration({
+              orderId,
+              paymentId: response.razorpay_payment_id,
+              amount: '₹99',
+              paymentStatus: 'Confirmed',
+              date: new Date().toISOString()
+            });
 
-
-            // Update user's registration data in Firebase if logged in
-            if (currentUser) {
-
-              await updateUserRegistration(referenceId, {
-                orderId,
-                paymentId: response.razorpay_payment_id,
-                amount: '₹99',
-                paymentStatus: 'Confirmed',
-                date: new Date().toISOString()
-              });
+            // Navigate to success page
+            navigate('/success');
+          } catch (error) {
+            // Check if payment is actually confirmed despite the error
+            try {
+              const paymentStatus = await checkPaymentStatus(authHeader);
+              if (paymentStatus.success) {
+                // Payment is actually confirmed
+                navigate('/success');
+                return;
+              }
+            } catch (statusError) {
+              console.error("Error checking payment status:", statusError);
             }
-
-            // Navigate with query parameter as backup
-
-            navigate(`/success?refId=${referenceId}`);;
-          } catch (err) {
-
-            // Still navigate to success even if confirmation fails
-            // This is because Razorpay has already confirmed the payment
-
-            navigate(`/success?refId=${referenceId}`);
+            
+            setError("Payment was processed but confirmation failed. Please contact support.");
+            setPaymentStep('error');
+            setLoading(false);
           }
         },
         prefill: {
@@ -238,34 +194,56 @@ const RegisterForm = () => {
           ondismiss: function () {
             setLoading(false);
             setPaymentStep('form');
-
+            
+            // Check if payment was successful despite modal being closed
+            setTimeout(async () => {
+              try {
+                const idToken = await currentUser.getIdToken(true);
+                const authHeader = { Authorization: `Bearer ${idToken}` };
+                const paymentStatus = await checkPaymentStatus(authHeader);
+                
+                if (paymentStatus.success) {
+                  navigate('/success');
+                }
+              } catch (error) {
+                console.error("Error checking payment status after dismiss:", error);
+              }
+            }, 2000);
           }
         }
       };
 
       // Create Razorpay instance and open payment form
-
       const razorpay = new window.Razorpay(options);
       razorpay.open();
 
     } catch (err) {
-
+      console.error('Registration error:', err);
       setError('An error occurred: ' + (err.response?.data?.error || err.message));
       setLoading(false);
       setPaymentStep('error');
 
       // Log error to server for debugging
       try {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/log-error`, {
+        await axios.post(`${API_BASE_URL}/api/log-error`, {
           message: err.message,
           stack: err.stack,
           user: currentUser ? { id: currentUser.uid, email: currentUser.email } : null,
           context: 'payment_flow'
         });
       } catch (logError) {
-
+        console.error('Failed to log error:', logError);
       }
     }
+  };
+
+  // Helper function to check payment status
+  const checkPaymentStatus = async (authHeader) => {
+    const response = await axios.get(
+      `${API_BASE_URL}/api/check-payment`,
+      { headers: authHeader }
+    );
+    return response.data;
   };
 
   return (
@@ -437,7 +415,10 @@ const RegisterForm = () => {
                   {error}
                   <button
                     className="block mt-2 text-red-700 underline"
-                    onClick={() => setError('')}
+                    onClick={() => {
+                      setError('');
+                      setPaymentStep('form');
+                    }}
                     type="button"
                   >
                     Try Again
