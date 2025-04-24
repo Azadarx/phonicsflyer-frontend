@@ -8,7 +8,7 @@ const UserMenu = () => {
   const [userData, setUserData] = useState(null);
   const dropdownRef = useRef(null);
   const { currentUser, logout, getUserData, isAdmin } = useAuth();
-  
+
   useEffect(() => {
     // Fetch user data from API when user is authenticated
     const fetchUserData = async () => {
@@ -17,14 +17,14 @@ const UserMenu = () => {
           const data = await getUserData(currentUser.uid);
           setUserData(data);
         } catch (err) {
-          
+
         }
       }
     };
-    
+
     fetchUserData();
   }, [currentUser, getUserData]);
-  
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,22 +32,22 @@ const UserMenu = () => {
         setIsOpen(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   const handleLogout = async () => {
     try {
       await logout();
-      setIsOpen(false);
+      navigate('/');
     } catch (err) {
-      
+
     }
   };
-  
+
   const getInitials = (name) => {
     if (!name) return "U";
     return name
@@ -57,7 +57,7 @@ const UserMenu = () => {
       .toUpperCase()
       .substring(0, 2);
   };
-  
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -67,7 +67,7 @@ const UserMenu = () => {
       >
         {currentUser?.displayName ? getInitials(currentUser.displayName) : "U"}
       </button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -86,7 +86,7 @@ const UserMenu = () => {
                 </span>
               )}
             </div>
-            
+
             <div className="py-2">
               <Link
                 to="/profile"
@@ -100,7 +100,7 @@ const UserMenu = () => {
                   My Profile
                 </div>
               </Link>
-              
+
               <button
                 onClick={handleLogout}
                 className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
