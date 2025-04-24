@@ -19,15 +19,27 @@ export const handlePaymentSuccess = (referenceId, userData = null) => {
         sessionStorage.setItem('userData', JSON.stringify(userData));
       }
       
+      // Log for debugging
+      console.log("Payment success data stored, redirecting to success page...");
+      
       // Navigate to success page with reference ID
       // Use a small timeout to ensure storage is complete before navigation
       setTimeout(() => {
-        window.location.href = `/success?refId=${referenceId}`;
-      }, 100);
+        window.location.href = `/success?refId=${encodeURIComponent(referenceId)}`;
+      }, 500); // Increased timeout to ensure storage is complete
     } catch (error) {
       console.error("Error handling payment success:", error);
+      
+      // Still try to set the important flags even if there was an error
+      try {
+        sessionStorage.setItem('paymentSuccessful', 'true');
+        sessionStorage.setItem('referenceId', referenceId);
+      } catch (e) {
+        console.error("Critical error storing payment data:", e);
+      }
+      
       // Fallback direct navigation
-      window.location.href = `/success?refId=${referenceId}`;
+      window.location.href = `/success?refId=${encodeURIComponent(referenceId)}`;
     }
   };
   
@@ -35,8 +47,13 @@ export const handlePaymentSuccess = (referenceId, userData = null) => {
    * Clears payment success data
    */
   export const clearPaymentData = () => {
-    sessionStorage.removeItem('paymentSuccessful');
-    sessionStorage.removeItem('referenceId');
-    sessionStorage.removeItem('userData');
-    // Don't remove from localStorage as it might be needed for order history
+    try {
+      sessionStorage.removeItem('paymentSuccessful');
+      sessionStorage.removeItem('referenceId');
+      sessionStorage.removeItem('userData');
+      // Don't remove from localStorage as it might be needed for order history
+      console.log("Payment data cleared successfully");
+    } catch (error) {
+      console.error("Error clearing payment data:", error);
+    }
   };

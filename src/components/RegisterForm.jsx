@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 import { useAuth } from '../contexts/AuthContext';
-import { handlePaymentSuccess } from '../utils/paymentHandlers' 
+import { handlePaymentSuccess } from '../utils/paymentHandlers'
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -122,9 +122,11 @@ const RegisterForm = () => {
         description: "Life-Changing Masterclass Registration",
         order_id: orderId,
         // In RegisterForm.jsx - replace the existing handler function
+        // In RegisterForm.jsx - replace the existing handler function in Razorpay options
         handler: async function (response) {
           try {
             setPaymentStep('success');
+            console.log("Payment succeeded, processing...");
 
             // Handle successful payment
             const paymentData = {
@@ -133,8 +135,9 @@ const RegisterForm = () => {
               razorpay_signature: response.razorpay_signature
             };
 
-            // Verify payment with backend
-            await axios.post(
+            // Verify payment with backend - but don't wait for it to complete
+            // This prevents delays in showing the success screen
+            const verifyPromise = axios.post(
               `${API_BASE_URL}/api/confirm-payment`,
               paymentData,
               {
@@ -142,9 +145,9 @@ const RegisterForm = () => {
               }
             );
 
-            // Update user's registration data in context (client-side)
-            await updateUserRegistration({
-              orderId,
+            // Also don't wait for this either - do it in parallel
+            const updatePromise = updateUserRegistration(response.razorpay_order_id, {
+              orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
               amount: '₹99',
               paymentStatus: 'Confirmed',
@@ -158,11 +161,30 @@ const RegisterForm = () => {
               phone: formData.phone
             };
 
+            // Redirect to success immediately while the operations happen in background
             handlePaymentSuccess(response.razorpay_order_id, userDataToStore);
 
-            // No need for manual navigation here as handlePaymentSuccess will redirect
+            // Try to complete operations in background
+            Promise.all([verifyPromise, updatePromise])
+              .catch(error => console.error("Background payment operations error:", error));
+
           } catch (error) {
-            // Rest of the error handling remains the same
+            console.error("Payment handler error:", error);
+
+            // Even if there's an error, try redirecting to success page
+            // since Razorpay already showed success
+            try {
+              const userDataToStore = {
+                fullName: formData.fullName,
+                email: formData.email,
+                phone: formData.phone
+              };
+              handlePaymentSuccess(response.razorpay_order_id, userDataToStore);
+            } catch (redirectError) {
+              console.error("Redirect error:", redirectError);
+              // Last resort direct navigation
+              window.location.href = "/success?manual=true";
+            }
           }
         },
         prefill: {
