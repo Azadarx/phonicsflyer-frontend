@@ -116,7 +116,7 @@ const RegisterForm = () => {
       // Step 4: Initialize Razorpay options
       const options = {
         key: razorpayKey,
-        amount: 100, // amount in paisa (99 INR)
+        amount: 9900, // amount in paisa (99 INR)
         currency: "INR",
         name: "Inspiring Shereen",
         description: "Life-Changing Masterclass Registration",
