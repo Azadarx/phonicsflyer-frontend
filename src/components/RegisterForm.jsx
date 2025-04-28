@@ -135,6 +135,7 @@ const RegisterForm = () => {
 
     // Ensure user is authenticated - should already be handled by AuthFlowHandler
     if (!currentUser) {
+      setError("Please sign in before registering");
       return; // Exit early - don't start payment process
     }
 
@@ -145,29 +146,59 @@ const RegisterForm = () => {
     try {
       // Get the current authentication token
       const idToken = await currentUser.getIdToken(true); // Force refresh to ensure token is valid
-      const authHeader = { Authorization: `Bearer ${idToken}` };
+
+      // Check if the auth token is actually available
+      if (!idToken) {
+        throw new Error("Unable to authenticate. Please sign in again.");
+      }
+
+      // Format the data for registration
+      const registrationData = {
+        ...formData,
+        courseName: 'Phonics English Course',
+        courseLevel: 'Beginner',
+        courseDuration: '3 months',
+        timestamp: new Date().toISOString(),
+        // Format location data properly for sending to server
+        country: formData.country?.name || '',
+        state: formData.state?.name || '',
+        city: formData.city || ''
+      };
 
       // Step 1: Save registration data in RTDB
-      await axios.post(
+      const registrationResponse = await axios.post(
         `${API_BASE_URL}/api/user/registrations`,
+        registrationData,
         {
-          ...formData,
-          courseName: 'Phonics English Course',
-          courseLevel: 'Beginner',
-          courseDuration: '3 months',
-          timestamp: new Date().toISOString()
-        },
-        {
-          headers: authHeader
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            'Content-Type': 'application/json'
+          }
         }
       );
+
+      if (!registrationResponse.data.success && registrationResponse.data.error) {
+        throw new Error(registrationResponse.data.error || 'Failed to save registration data');
+      }
 
       // Step 2: Create payment order with Razorpay
       const orderResponse = await axios.post(
         `${API_BASE_URL}/api/create-payment-order`,
-        {},  // Empty body as server will get user info from Firebase
         {
-          headers: authHeader
+          amount: discountApplied ? 7900 : 9900, // Pass amount explicitly (in paisa)
+          currency: "INR",
+          receipt: `receipt_${Date.now()}`,
+          notes: {
+            courseName: 'Phonics English Course',
+            userEmail: formData.email,
+            discount: discountApplied ? '20%' : 'none'
+          }
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            'Content-Type': 'application/json'
+          }
         }
       );
 
@@ -187,7 +218,7 @@ const RegisterForm = () => {
       // Step 4: Initialize Razorpay options
       const options = {
         key: razorpayKey,
-        amount: 9900, // amount in paisa (99 INR)
+        amount: discountApplied ? 7900 : 9900, // amount in paisa (99 INR or 79 INR with discount)
         currency: "INR",
         name: "Inspiring Shereen",
         description: "Phonics English Course Registration",
@@ -204,13 +235,19 @@ const RegisterForm = () => {
               razorpay_signature: response.razorpay_signature
             };
 
+            // Get a fresh token for verification request
+            const freshToken = await currentUser.getIdToken(true);
+
             // Verify payment with backend - but don't wait for it to complete
             // This prevents delays in showing the success screen
             const verifyPromise = axios.post(
               `${API_BASE_URL}/api/confirm-payment`,
               paymentData,
               {
-                headers: authHeader
+                headers: {
+                  Authorization: `Bearer ${freshToken}`,
+                  'Content-Type': 'application/json'
+                }
               }
             );
 
@@ -218,7 +255,7 @@ const RegisterForm = () => {
             const updatePromise = updateUserRegistration(response.razorpay_order_id, {
               orderId: response.razorpay_order_id,
               paymentId: response.razorpay_payment_id,
-              amount: '₹99',
+              amount: discountApplied ? '₹79' : '₹99',
               paymentStatus: 'Confirmed',
               date: new Date().toISOString()
             });
@@ -228,9 +265,9 @@ const RegisterForm = () => {
               fullName: formData.fullName,
               email: formData.email,
               phone: formData.phone,
-              country: formData.country.name,
-              state: formData.state.name,
-              city: formData.city
+              country: formData.country?.name || '',
+              state: formData.state?.name || '',
+              city: formData.city || ''
             };
 
             // Redirect to success immediately while the operations happen in background
@@ -250,9 +287,9 @@ const RegisterForm = () => {
                 fullName: formData.fullName,
                 email: formData.email,
                 phone: formData.phone,
-                country: formData.country.name,
-                state: formData.state.name,
-                city: formData.city
+                country: formData.country?.name || '',
+                state: formData.state?.name || '',
+                city: formData.city || ''
               };
               handlePaymentSuccess(response.razorpay_order_id, userDataToStore);
             } catch (redirectError) {
@@ -279,8 +316,7 @@ const RegisterForm = () => {
             setTimeout(async () => {
               try {
                 const idToken = await currentUser.getIdToken(true);
-                const authHeader = { Authorization: `Bearer ${idToken}` };
-                const paymentStatus = await checkPaymentStatus(authHeader);
+                const paymentStatus = await checkPaymentStatus(idToken);
 
                 if (paymentStatus.success) {
                   navigate('/success');
@@ -305,11 +341,17 @@ const RegisterForm = () => {
 
       // Log error to server for debugging
       try {
+        const idToken = await currentUser.getIdToken(true);
         await axios.post(`${API_BASE_URL}/api/log-error`, {
           message: err.message,
           stack: err.stack,
           user: currentUser ? { id: currentUser.uid, email: currentUser.email } : null,
           context: 'payment_flow'
+        }, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            'Content-Type': 'application/json'
+          }
         });
       } catch (logError) {
         console.error('Failed to log error:', logError);
@@ -318,10 +360,15 @@ const RegisterForm = () => {
   };
 
   // Helper function to check payment status
-  const checkPaymentStatus = async (authHeader) => {
+  const checkPaymentStatus = async (idToken) => {
     const response = await axios.get(
       `${API_BASE_URL}/api/check-payment`,
-      { headers: authHeader }
+      {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json'
+        }
+      }
     );
     return response.data;
   };
@@ -374,12 +421,19 @@ const RegisterForm = () => {
               className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 relative z-10"
             >
               {/* User status indicator */}
-              {currentUser && (
+              {currentUser ? (
                 <div className="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
                   <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                   Signed in as {currentUser.email}
+                </div>
+              ) : (
+                <div className="mb-6 p-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm flex items-center">
+                  <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                  </svg>
+                  Please sign in to continue with registration
                 </div>
               )}
 
