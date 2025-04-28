@@ -71,37 +71,44 @@ const UserMenu = () => {
       <div className="relative" ref={dropdownRef}>
         {currentUser ? (
           // Logged in user menu
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(!isOpen)}
-            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-medium hover:shadow-lg transition-all focus:outline-none"
+            className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-r from-teal-600 to-blue-600 text-white font-medium hover:shadow-lg transition-all focus:outline-none"
             aria-label="User menu"
           >
             {currentUser.displayName ? getInitials(currentUser.displayName) : "U"}
-          </button>
+          </motion.button>
         ) : (
           // Login button for non-authenticated users
-          <button
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             onClick={handleAuthButtonClick}
-            className="px-4 py-2 rounded-md bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white font-medium hover:shadow-lg transition-all focus:outline-none"
+            className="px-4 py-2 rounded-md bg-gradient-to-r from-teal-600 to-blue-600 text-white font-medium hover:shadow-lg transition-all focus:outline-none"
           >
             Sign In
-          </button>
+          </motion.button>
         )}
 
         <AnimatePresence>
           {isOpen && currentUser && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute right-0 mt-2 w-64 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+              initial={{ opacity: 0, y: -10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.95 }}
+              transition={{ type: "spring", duration: 0.3, bounce: 0.3 }}
+              className="absolute right-0 mt-2 w-64 rounded-xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 z-50 overflow-hidden"
             >
+              {/* Decorative top bar */}
+              <div className="h-1 bg-gradient-to-r from-teal-600 to-blue-600"></div>
+              
               <div className="p-4 border-b border-gray-100">
                 <p className="font-medium text-gray-800">{currentUser.displayName || "User"}</p>
                 <p className="text-sm text-gray-500 truncate">{currentUser.email}</p>
                 {isAdmin && (
-                  <span className="inline-block px-2 py-1 mt-1 text-xs font-medium text-white bg-violet-600 rounded-full">
+                  <span className="inline-block px-2 py-1 mt-1 text-xs font-medium text-white bg-gradient-to-r from-teal-600 to-blue-600 rounded-full">
                     Admin
                   </span>
                 )}
@@ -110,7 +117,7 @@ const UserMenu = () => {
               <div className="py-2">
                 <Link
                   to="/profile"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-violet-50 hover:text-violet-600 transition-colors"
+                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-teal-50 hover:text-teal-600 transition-colors"
                   onClick={() => setIsOpen(false)}
                 >
                   <div className="flex items-center">
@@ -121,7 +128,8 @@ const UserMenu = () => {
                   </div>
                 </Link>
 
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                 >
@@ -131,7 +139,7 @@ const UserMenu = () => {
                     </svg>
                     Sign Out
                   </div>
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           )}

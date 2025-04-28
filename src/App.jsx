@@ -4,7 +4,6 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
 import Features from './components/Features';
-import Coaches from './components/Coaches';
 import Testimonials from './components/Testimonials';
 import Pricing from './components/Pricing';
 import Footer from './components/Footer';
@@ -16,6 +15,8 @@ import RefundAndCancellation from './components/RefundAndCancellation';
 import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 import Profile from './components/Profile';
 import AuthFlowHandler from './components/auth/AuthFlowHandler';
+import Instructors from './components/Instructors';
+import Courses from './components/Courses';
 
 function App() {
   return (
@@ -27,10 +28,12 @@ function App() {
             <Hero />
             <About />
             <Features />
-            <Coaches />
-            <Testimonials />
+            <Instructors />
+            <Courses />
             <Pricing />
+            <Testimonials />
             <RegisterForm />
+            <ContactUs />
             <Footer />
           </div>
         } />
@@ -43,7 +46,8 @@ function App() {
           </>
         } />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/ContactUs" element={<ContactUs />} />
+        <Route path="/courses" element={<Courses />} />
+        <Route path="/contact" element={<ContactUs />} />
         <Route path="/TermsandConditions" element={<TermsAndConditions />} />
         <Route path="/RefundandCancellation" element={<RefundAndCancellation />} />
         <Route path="/privacypolicy" element={<RazorpayPrivacyPolicy />} />

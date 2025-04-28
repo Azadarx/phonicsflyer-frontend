@@ -32,22 +32,22 @@ const Footer = () => {
       hoverColor: "from-pink-700 to-purple-700"
     },
     {
-      name: "Twitter",
-      url: "https://twitter.com/",
+      name: "WhatsApp",
+      url: "https://wa.me/918897125110",
       icon: (
         <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
         </svg>
       ),
-      bgColor: "from-blue-400 to-cyan-400",
-      hoverColor: "from-blue-500 to-cyan-500"
+      bgColor: "from-green-600 to-green-400",
+      hoverColor: "from-green-700 to-green-500"
     }
   ];
 
   return (
-    <footer className="relative overflow-hidden bg-gradient-to-b from-indigo-900 to-purple-900 text-white">
+    <footer className="relative overflow-hidden bg-gradient-to-b from-blue-900 to-teal-900 text-white">
       {/* Reduced background elements - just 1 static div instead of animated ones */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-400/20 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-teal-400/20 via-transparent to-transparent"></div>
 
       {/* Footer content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -60,14 +60,14 @@ const Footer = () => {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-pink-300">
-                Inspiring Shereen
+              <h2 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-teal-300 to-cyan-300">
+                Asta Education Academy
               </h2>
-              <div className="w-16 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mb-6"></div>
+              <div className="w-16 h-1 bg-gradient-to-r from-teal-400 to-cyan-400 rounded-full mb-6"></div>
             </motion.div>
 
             <p className="text-gray-300 mb-6 text-lg">
-              Transforming lives through holistic coaching and empowering you to reach your full potential.
+              Transforming lives through quality education and personalized coaching in phonics, English speaking, and life skills.
             </p>
 
             {/* Social icons - keep the hover animations as they're interactive */}
@@ -82,7 +82,7 @@ const Footer = () => {
                   whileHover={{
                     scale: 1.1,
                     y: -5,
-                    boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.5)"
+                    boxShadow: "0 10px 25px -5px rgba(13, 148, 136, 0.5)"
                   }}
                   onHoverStart={() => setHoveredIcon(index)}
                   onHoverEnd={() => setHoveredIcon(null)}
@@ -104,24 +104,24 @@ const Footer = () => {
           <div className="md:col-span-1">
             <h3 className="text-xl font-bold mb-6 text-white">Quick Links</h3>
             <ul className="space-y-4">
-              {["About", "What You'll Learn", "Coaches", "Event Details"].map((item, index) => (
+              {["Home", "Courses", "About Us", "Testimonials", "Contact Us"].map((item, index) => (
                 <li key={index}>
                   <a
                     href={`#${item.toLowerCase().replace(/\s+/g, '')}`}
                     className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
                   >
-                    <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
+                    <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
                     {item}
                   </a>
                 </li>
               ))}
               <li>
                 <Link
-                  to="/register"
+                  to="/enroll"
                   className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
                 >
-                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
-                  Register
+                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
+                  Enroll Now
                 </Link>
               </li>
             </ul>
@@ -132,17 +132,17 @@ const Footer = () => {
             <h3 className="text-xl font-bold mb-6 text-white">Resources</h3>
             <ul className="space-y-4">
               {[
-                { name: "Contact Us", path: "/ContactUs" },
-                { name: "Terms & Conditions", path: "/TermsandConditions" },
-                { name: "Refund Policy", path: "/RefundandCancellation" },
-                { name: "Privacy Policy", path: "/privacypolicy" }
+                { name: "Phonics Course", path: "/course/phonics" },
+                { name: "Spoken English", path: "/course/spoken-english" },
+                { name: "Privacy Policy", path: "/privacy-policy" },
+                { name: "Terms & Conditions", path: "/terms-conditions" }
               ].map((item, index) => (
                 <li key={index}>
                   <Link
                     to={item.path}
                     className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300"
                   >
-                    <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
+                    <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
                     {item.name}
                   </Link>
                 </li>
@@ -150,41 +150,45 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact & Newsletter */}
+          {/* Contact */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-6 text-white">Contact & Newsletter</h3>
+            <h3 className="text-xl font-bold mb-6 text-white">Contact Info</h3>
             <ul className="space-y-4">
               <li>
-                <a href="mailto:inspiringshereen@gmail.com" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
-                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
-                  inspiringshereen@gmail.com
+                <a href="mailto:phonicswithshereen@gmail.com" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
+                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
+                  phonicswithshereen@gmail.com
                 </a>
               </li>
               <li>
-                <a href="tel:+1234567890" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
-                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-purple-400 to-pink-400 mr-0 group-hover:mr-2"></span>
-                  +91 99516 11674
+                <a href="tel:+918897125110" className="group flex items-center text-gray-300 hover:text-white transition-colors duration-300">
+                  <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
+                  +91 8897 125 110
                 </a>
+              </li>
+              <li className="text-gray-300 group">
+                <span className="inline-block w-0 group-hover:w-4 transition-all duration-300 h-0.5 bg-gradient-to-r from-teal-400 to-cyan-400 mr-0 group-hover:mr-2"></span>
+                Opposite Sanjary Function Palace, Ftihar Chowk, Yakutpura Station Road, Hyderabad – 500023
               </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-6 text-white">Stay Updated</h3>
-            <p className="text-gray-300 mb-4">Subscribe to our newsletter for latest updates and events.</p>
+            <h3 className="text-xl font-bold mb-6 text-white">Newsletter</h3>
+            <p className="text-gray-300 mb-4">Subscribe to get updates on our latest courses and special offers.</p>
             <form className="space-y-3">
               <div className="relative">
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="w-full px-4 py-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400"
+                  className="w-full px-4 py-3 bg-white/10 rounded-lg backdrop-blur-sm border border-white/20 text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-teal-400"
                   required
                 />
               </div>
               <button
                 type="submit"
-                className="w-full px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg font-medium text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
+                className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 rounded-lg font-medium text-white transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
               >
                 Subscribe
               </button>
@@ -195,7 +199,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-16 pt-8 border-t border-white/10 text-center">
           <p className="text-gray-400">
-            © {currentYear} Inspiring Shereen. All rights reserved.
+            © {currentYear} Asta Education Academy. All rights reserved.
           </p>
         </div>
       </div>
