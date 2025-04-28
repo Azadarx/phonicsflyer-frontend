@@ -1,8 +1,9 @@
 // src/components/Instructors.jsx
 import React, { useRef, useState } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-// import shereenImg from '../assets/shereen.jpg';
-// import assistantImg from '../assets/assistant.jpg';
+import shereenImg from '../assets/mam.jpg';
+import assistantImg from '../assets/sir.jpg';
+import { Link } from 'react-router-dom';
 
 const Instructors = () => {
   const ref = useRef(null);
@@ -14,7 +15,7 @@ const Instructors = () => {
       name: "Shereen Begum",
       title: "Phonics Expert & Lead Instructor",
       description: "Transforming language learning through innovative phonics",
-      image: {},
+      image: "https://life-coaching-frontend.vercel.app/assets/mam-Cfx9nYsC.jpg",
       bio: "With over 15 years of experience in education, Shereen has helped thousands of students master English language through her specialized phonics methodology.",
       expertise: ["Phonics Teaching", "English Pronunciation", "Reading Skills"]
     },
@@ -22,7 +23,7 @@ const Instructors = () => {
       name: "Aisha Khan",
       title: "English Language Specialist",
       description: "Helping adults and children master communication skills",
-      image: {},
+      image: assistantImg,
       bio: "A dedicated educator with 8+ years of experience in teaching English to diverse age groups using effective, interactive learning techniques.",
       expertise: ["Spoken English", "Grammar Mastery", "Conversation Practice"]
     }
@@ -114,9 +115,9 @@ const Instructors = () => {
                             ))}
                           </div>
                         </div>
-                        <button className="px-6 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full hover:from-blue-700 hover:to-cyan-700 transition-all transform hover:scale-105">
+                        <Link to="/register" className="px-6 py-3 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-full hover:from-blue-700 hover:to-cyan-700 transition-all transform hover:scale-105">
                           Book a Demo Class
-                        </button>
+                        </Link>
                       </motion.div>
                     )}
                   </AnimatePresence>

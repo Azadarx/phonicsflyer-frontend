@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+
 
 const SignUp = ({ onClose, switchToSignIn }) => {
   const [formData, setFormData] = useState({
@@ -22,34 +24,37 @@ const SignUp = ({ onClose, switchToSignIn }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
       await signup(formData.email, formData.password, formData.fullName, formData.phone);
-      onClose();
+      navigate('/'); // 👈 Go to home after signup
+      onClose(); // If you still want to close the modal
+
     } catch (err) {
       // Error is already set in the context
     } finally {
       setIsLoading(false);
     }
   };
+  const navigate = useNavigate();
 
   return (
     <div className="bg-white rounded-lg p-6 w-full max-w-md mx-auto">
       <h2 className="text-2xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-blue-600">Create Account</h2>
-      
+
       {error && (
         <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm border-l-4 border-red-500">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label htmlFor="fullName" className="block text-gray-700 font-medium mb-2">Full Name</label>
@@ -71,7 +76,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
             />
           </div>
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="signupEmail" className="block text-gray-700 font-medium mb-2">Email</label>
           <div className="relative">
@@ -92,7 +97,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
             />
           </div>
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="phone" className="block text-gray-700 font-medium mb-2">Phone</label>
           <div className="relative">
@@ -113,7 +118,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
             />
           </div>
         </div>
-        
+
         <div className="mb-4">
           <label htmlFor="password" className="block text-gray-700 font-medium mb-2">Password</label>
           <div className="relative">
@@ -134,7 +139,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
             />
           </div>
         </div>
-        
+
         <div className="mb-6">
           <label htmlFor="confirmPassword" className="block text-gray-700 font-medium mb-2">Confirm Password</label>
           <div className="relative">
@@ -155,7 +160,7 @@ const SignUp = ({ onClose, switchToSignIn }) => {
             />
           </div>
         </div>
-        
+
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -174,19 +179,19 @@ const SignUp = ({ onClose, switchToSignIn }) => {
           ) : "Sign Up"}
         </motion.button>
       </form>
-      
+
       <div className="mt-6 text-center">
         <p className="text-gray-600">
           Already have an account?{" "}
-          <button 
-            onClick={switchToSignIn} 
+          <button
+            onClick={switchToSignIn}
             className="font-medium bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 transition-all duration-300"
           >
             Sign In
           </button>
         </p>
       </div>
-      
+
       {/* Decorative element */}
       <div className="w-16 h-1 bg-gradient-to-r from-teal-600 to-blue-600 mx-auto mt-6 rounded-full"></div>
     </div>

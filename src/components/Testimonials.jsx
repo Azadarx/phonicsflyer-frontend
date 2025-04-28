@@ -139,6 +139,7 @@ const Testimonials = () => {
         {/* CTA Button */}
         <div className="mt-16 text-center">
           <motion.button
+            onClick={() => window.location.href = "/register"}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 shadow-lg"

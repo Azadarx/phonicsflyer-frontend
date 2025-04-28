@@ -1,6 +1,7 @@
 // src/components/Hero.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
+import heroImg from '../assets/heroImg.jpg'; 
 
 const Hero = () => {
   return (
@@ -8,12 +9,12 @@ const Hero = () => {
       {/* Decorative elements */}
       <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-gradient-to-br from-blue-300 to-teal-300 rounded-full blur-3xl opacity-20"></div>
       <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-80 h-80 bg-gradient-to-tr from-teal-300 to-emerald-300 rounded-full blur-3xl opacity-20"></div>
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-24 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           {/* Text content */}
           <div className="md:col-span-7 text-center md:text-left">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
@@ -23,8 +24,8 @@ const Hero = () => {
                 TRANSFORM YOUR LEARNING JOURNEY
               </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1 }}
@@ -35,25 +36,25 @@ const Hero = () => {
                 <span className="absolute bottom-1 left-0 w-full h-3 bg-gradient-to-r from-teal-300 to-blue-300 opacity-60 -rotate-1"></span>
               </span> at Any Age
             </motion.h1>
-            
+
             <div className="w-24 h-2 bg-gradient-to-r from-teal-600 to-blue-600 mb-6 md:mx-0 mx-auto rounded-full"></div>
-            
+
             <h2 className="text-2xl font-bold text-teal-600 mb-4">
               Expert coaching in Phonics English and Life Skills
             </h2>
-            
+
             <p className="text-xl text-gray-600 mb-8 max-w-2xl">
               Join our specialized courses by Shereen Begum with over 15 years of experience in the education industry. Perfect for both students and adults looking to enhance their language skills.
             </p>
-            
-            <motion.div 
+
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2 }}
               className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4"
             >
               <motion.button
-                whileHover={{ 
+                whileHover={{
                   scale: 1.05,
                   boxShadow: "0 10px 30px -10px rgba(13, 148, 136, 0.5)"
                 }}
@@ -73,7 +74,7 @@ const Hero = () => {
                 <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-md text-sm font-semibold">50% OFF</span>
               </span>
             </motion.div>
-            
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -88,7 +89,7 @@ const Hero = () => {
                 </div>
                 <span className="ml-2 text-sm font-medium text-gray-600">Certified Courses</span>
               </div>
-              
+
               <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full shadow-sm">
                 <div className="h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center">
                   <svg className="h-4 w-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -97,7 +98,7 @@ const Hero = () => {
                 </div>
                 <span className="ml-2 text-sm font-medium text-gray-600">Personalized Learning Plans</span>
               </div>
-              
+
               <div className="flex items-center bg-gray-50 px-4 py-2 rounded-full shadow-sm">
                 <div className="h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center">
                   <svg className="h-4 w-4 text-teal-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -108,7 +109,7 @@ const Hero = () => {
               </div>
             </motion.div>
           </div>
-          
+
           {/* Image container */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -119,13 +120,13 @@ const Hero = () => {
             <div className="relative">
               {/* Main image */}
               <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl transform -rotate-2 border-4 border-white">
-                <img 
-                  src="https://media.istockphoto.com/id/1368151370/photo/language-teacher-giving-english-lesson-to-adult-students-in-the-classroom.jpg?s=612x612&w=0&k=20&c=Rt93GmKZW4oOl5BkKKQYrQbizUL0nNNlQ_qXGYYy17M=" 
-                  alt="Phonics English Learning" 
+                <img
+                  src={heroImg}
+                  alt="Phonics English Learning"
                   className="w-full h-full object-cover"
                 />
               </div>
-              
+
               {/* Feature cards */}
               <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-lg z-20 transform rotate-6">
                 <div className="flex items-center gap-2">
@@ -136,7 +137,7 @@ const Hero = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="absolute -top-6 -right-6 bg-white rounded-xl p-4 shadow-lg z-20 transform -rotate-6">
                 <div className="flex items-center gap-2">
                   <div className="text-2xl bg-gradient-to-r from-blue-500 to-teal-500 text-white w-10 h-10 rounded-full flex items-center justify-center">🎓</div>

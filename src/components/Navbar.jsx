@@ -1,6 +1,6 @@
 // src/components/Navbar.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import AuthModal from './auth/AuthModal';
@@ -12,8 +12,17 @@ const Navbar = () => {
   const [activeSection, setActiveSection] = useState('home');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const { currentUser } = useAuth();
+  const location = useLocation();
 
+  // Set active section based on the current path or scroll position
   useEffect(() => {
+    // First check if we're on a specific route
+    if (location.pathname === '/') {
+      setActiveSection('home');
+    } else if (location.pathname === '/contact') {
+      setActiveSection('contact');
+    }
+
     const handleScroll = () => {
       if (window.scrollY > 50) {
         setScrolled(true);
@@ -21,28 +30,66 @@ const Navbar = () => {
         setScrolled(false);
       }
 
-      // Check if we're at the top for "home" active state
-      if (window.scrollY < 100) {
-        setActiveSection('home');
-        return;
-      }
-
-      // Active section detection
-      const sections = ['about', 'courses', 'contact'];
-      sections.forEach(section => {
-        const element = document.getElementById(section);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          if (rect.top <= 100 && rect.bottom >= 100) {
-            setActiveSection(section);
-          }
+      // Only do scroll-based section detection on the home page
+      if (location.pathname === '/') {
+        // Check if we're at the top for "home" active state
+        if (window.scrollY < 100) {
+          setActiveSection('home');
+          return;
         }
-      });
+
+        // Active section detection
+        const sections = ['about', 'courses', 'contact'];
+        sections.forEach(section => {
+          const element = document.getElementById(section);
+          if (element) {
+            const rect = element.getBoundingClientRect();
+            if (rect.top <= 100 && rect.bottom >= 100) {
+              setActiveSection(section);
+            }
+          }
+        });
+      }
     };
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
+
+  // Handle smooth scrolling for hash links
+  const handleNavClick = (section) => {
+    setIsOpen(false);
+    
+    if (location.pathname !== '/') {
+      // If we're not on the home page, navigate to home and then scroll
+      // This is handled elsewhere, so we just return
+      return;
+    }
+    
+    // If we're on the home page, scroll to the section
+    if (section === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      const element = document.getElementById(section);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  // Generate the correct href based on whether the link is to a section on the homepage
+  // or to a separate page
+  const getHref = (item) => {
+    if (item === 'home') return '/';
+    
+    // If we're already on the homepage, use hash links
+    if (location.pathname === '/') {
+      return `#${item}`;
+    }
+    
+    // Otherwise, return full page links
+    return `/${item}`;
+  };
 
   return (
     <>
@@ -69,13 +116,14 @@ const Navbar = () => {
             <div className="hidden sm:flex items-center">
               <div className="flex items-center space-x-6">
                 {['home', 'about', 'courses', 'contact'].map((item) => (
-                  <a
+                  <Link
                     key={item}
-                    href={item === 'home' ? '/' : `#${item}`}
+                    to={getHref(item)}
                     className={`relative px-2 py-2 text-sm font-medium transition-colors duration-300 hover:scale-110 ${activeSection === item
                       ? 'text-teal-600'
                       : 'text-gray-700 hover:text-teal-500'
                       }`}
+                    onClick={() => handleNavClick(item)}
                   >
                     {item.charAt(0).toUpperCase() + item.slice(1)}
                     {activeSection === item && (
@@ -87,7 +135,7 @@ const Navbar = () => {
                         transition={{ type: "spring", stiffness: 300, damping: 30 }}
                       />
                     )}
-                  </a>
+                  </Link>
                 ))}
               </div>
 
@@ -190,17 +238,17 @@ const Navbar = () => {
             >
               <div className="px-6 pt-2 pb-3 space-y-2 bg-white shadow-lg">
                 {['home', 'about', 'courses', 'contact'].map((item) => (
-                  <a
+                  <Link
                     key={item}
-                    href={item === 'home' ? '/' : `#${item}`}
+                    to={getHref(item)}
                     className={`block px-3 py-2 text-base font-medium rounded-md ${activeSection === item
                       ? 'text-teal-600 bg-teal-50'
                       : 'text-gray-700 hover:bg-gray-50 hover:text-teal-600'
                       }`}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => handleNavClick(item)}
                   >
                     {item.charAt(0).toUpperCase() + item.slice(1)}
-                  </a>
+                  </Link>
                 ))}
                 <Link
                   to="/register"
