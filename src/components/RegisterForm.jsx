@@ -186,7 +186,7 @@ const RegisterForm = () => {
       const orderResponse = await axios.post(
         `${API_BASE_URL}/api/create-payment-order`,
         {
-          amount: discountApplied ? 7900 : 9900, // Pass amount explicitly (in paisa)
+          amount: discountApplied ? 7900 : 100, // Pass amount explicitly (in paisa)
           currency: "INR",
           receipt: `receipt_${Date.now()}`,
           notes: {
