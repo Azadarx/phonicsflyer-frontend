@@ -46,7 +46,6 @@ function App() {
               <Courses />
               <Pricing />
               <Testimonials />
-              <RegisterForm />
               <Contact />
               <Footer />
             </div>
