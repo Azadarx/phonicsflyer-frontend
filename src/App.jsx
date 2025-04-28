@@ -18,7 +18,7 @@ import Instructors from './components/Instructors';
 import Courses from './components/Courses';
 import ScrollToTop from './components/ScrollToTop';
 import Loader from './components/Loader';
-import Contact from './components/Contact'; // Fixed capitalization
+import Contact from './components/contact';
 
 function App() {
   const [isLoading, setIsLoading] = useState(true);
