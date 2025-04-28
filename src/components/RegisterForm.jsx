@@ -145,8 +145,8 @@ const RegisterForm = () => {
 
     try {
       // Get the current authentication token
-      console.log('ID Token:', idToken);
       const idToken = await currentUser.getIdToken(true); // Force refresh to ensure token is valid
+      console.log('ID Token:', idToken);
 
       // Check if the auth token is actually available
       if (!idToken) {
