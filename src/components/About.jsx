@@ -72,7 +72,7 @@ const About = () => {
             <div className="relative z-10 rounded-xl md:rounded-2xl lg:rounded-3xl overflow-hidden shadow-lg md:shadow-xl lg:shadow-2xl border-2 md:border-3 lg:border-4 border-white">
               <img
                 src={"https://res.cloudinary.com/dbofquzdr/image/upload/v1745958061/coaches/lz4dsfmupn2htwscixte.jpg"}
-                alt="Shereen Begum - Phonics Expert"
+                alt="Mrs. Shereen - Phonics Expert"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.target.src = "https://res.cloudinary.com/dbofquzdr/image/upload/v1745958061/coaches/lz4dsfmupn2htwscixte.jpg";
@@ -103,7 +103,7 @@ const About = () => {
             </motion.h3>
 
             <motion.p variants={itemVariants} className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-5 md:mb-6">
-              With over 15 years of experience in the education industry, Shereen Begum has dedicated her career to transforming how people learn English. Her specialized phonics approach has helped students of all ages master reading, pronunciation, and communication skills.
+              With over 15 years of experience in the education industry, Mrs. Shereen has dedicated her career to transforming how people learn English. Her specialized phonics approach has helped students of all ages master reading, pronunciation, and communication skills.
             </motion.p>
 
             <motion.p variants={itemVariants} className="text-base sm:text-lg text-gray-600 mb-6 sm:mb-7 md:mb-8">

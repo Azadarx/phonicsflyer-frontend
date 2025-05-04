@@ -130,7 +130,7 @@ const Contact = () => {
                   About Our Phonics Program
                 </h3>
                 <p className="text-gray-700 mb-4">Our comprehensive phonics curriculum is designed for learners of all ages, from young students to adults seeking to improve their English pronunciation and reading skills.</p>
-                <p className="text-gray-700 mb-2"><span className="font-medium">Instructor:</span> Shereen Begum</p>
+                <p className="text-gray-700 mb-2"><span className="font-medium">Instructor:</span> Mrs. Shereen</p>
                 <p className="text-gray-700 mb-2"><span className="font-medium">Certification:</span> Advanced Phonics Teaching Specialist</p>
                 <p className="text-gray-700"><span className="font-medium">Experience:</span> 15+ years teaching phonics to diverse age groups</p>
               </motion.div>

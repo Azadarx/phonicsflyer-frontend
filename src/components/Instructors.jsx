@@ -190,7 +190,7 @@ const Instructors = () => {
   // Function to load the default instructor when no data is available
   const loadDefaultInstructor = () => {
     const defaultInstructor = {
-      name: "Shereen Begum",
+      name: "Mrs. Shereen",
       title: "Phonics Expert & Lead Instructor",
       description: "Transforming language learning through innovative phonics",
       image: "https://life-coaching-frontend.vercel.app/assets/mam-Cfx9nYsC.jpg",

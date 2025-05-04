@@ -28,7 +28,7 @@ const RefundAndCancellation = () => {
     {
       icon: <CreditCard className="h-8 w-8 text-pink-500" />,
       title: "Perishable Items",
-      content: "SHEREEN BEGUM does not accept cancellation requests for perishable items like flowers, eatables etc. However, refund/replacement can be made if the customer establishes that the quality of product delivered is not good."
+      content: "Mrs. Shereen does not accept cancellation requests for perishable items like flowers, eatables etc. However, refund/replacement can be made if the customer establishes that the quality of product delivered is not good."
     },
     {
       icon: <RotateCcw className="h-8 w-8 text-purple-500" />,
@@ -99,7 +99,7 @@ const RefundAndCancellation = () => {
               transition={{ delay: 0.5 }}
               className="text-xl text-gray-700 mb-10 leading-relaxed"
             >
-              SHEREEN BEGUM believes in helping its customers as far as possible, and has therefore a liberal
+              Mrs. Shereen believes in helping its customers as far as possible, and has therefore a liberal
               cancellation policy. Under this policy:
             </motion.p>
             
@@ -138,7 +138,7 @@ const RefundAndCancellation = () => {
               <h3 className="font-bold text-gray-800 text-lg mb-2">Manufacturer Warranty</h3>
               <p className="text-gray-600">
                 In case of complaints regarding products that come with a warranty from manufacturers, please refer
-                the issue to them. In case of any Refunds approved by the SHEREEN BEGUM, it'll take 3-5 Days days
+                the issue to them. In case of any Refunds approved by the Mrs. Shereen, it'll take 3-5 Days days
                 for the refund to be processed to the end customer.
               </p>
             </motion.div>

@@ -89,7 +89,7 @@ const TermsAndConditions = () => {
               >
                 <p className="text-gray-700 leading-relaxed mb-8">
                   These Terms and Conditions, along with privacy policy or other terms ("Terms") constitute a binding
-                  agreement by and between SHEREEN BEGUM, ("Website Owner" or "we" or "us" or "our") and you
+                  agreement by and between Mrs. Shereen, ("Website Owner" or "we" or "us" or "our") and you
                   ("you" or "your") and relate to your use of our website, goods (as applicable) or services (as applicable)
                   (collectively, "Services").
                 </p>

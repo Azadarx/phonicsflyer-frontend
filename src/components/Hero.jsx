@@ -44,7 +44,7 @@ const Hero = () => {
             </h2>
 
             <p className="text-xl text-gray-600 mb-8 max-w-2xl">
-              Join our specialized courses by Shereen Begum with over 15 years of experience in the education industry. Perfect for both students and adults looking to enhance their language skills.
+              Join our specialized courses by Mrs. Shereen with over 15 years of experience in the education industry. Perfect for both students and adults looking to enhance their language skills.
             </p>
 
             <motion.div
