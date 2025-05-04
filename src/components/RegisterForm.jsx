@@ -1,21 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import { handlePaymentSuccess } from '../utils/paymentHandlers'
-import Select from "react-select";
-import { Country, State, City } from "country-state-city";
-
+import { handlePaymentSuccess } from '../utils/paymentHandlers';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    country: '',
-    state: '',
-    city: '',
     couponCode: ''
   });
   const [loading, setLoading] = useState(false);
@@ -23,43 +16,7 @@ const RegisterForm = () => {
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'processing', 'success', 'error'
   const [discountApplied, setDiscountApplied] = useState(false);
   const navigate = useNavigate();
-  const { currentUser, updateUserRegistration } = useAuth();
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
-  // Define customStyles here so it's available throughout the component
-  const customStyles = {
-    control: (base) => ({
-      ...base,
-      padding: '2px',
-      borderRadius: '0.5rem',
-      borderColor: '#e2e8f0',
-      boxShadow: 'none',
-      minHeight: '46px',
-      '&:hover': {
-        borderColor: '#a5b4fc'
-      }
-    }),
-    menu: (base) => ({
-      ...base,
-      borderRadius: '0.375rem',
-      overflow: 'hidden'
-    }),
-    container: (base) => ({
-      ...base,
-      width: '100%'
-    })
-  };
-
-  // Pre-fill form with user data if logged in
-  useEffect(() => {
-    if (currentUser) {
-      setFormData({
-        ...formData,
-        fullName: currentUser.displayName || formData.fullName,
-        email: currentUser.email || formData.email,
-      });
-    }
-  }, [currentUser]);
 
   // Simplified animation variants
   const formVariants = {
@@ -94,31 +51,6 @@ const RegisterForm = () => {
     });
   };
 
-  // Add the missing handler functions
-  const handleCountryChange = (selectedCountry) => {
-    setFormData({
-      ...formData,
-      country: selectedCountry,
-      state: '',
-      city: ''
-    });
-  };
-
-  const handleStateChange = (selectedState) => {
-    setFormData({
-      ...formData,
-      state: selectedState,
-      city: ''
-    });
-  };
-
-  const handleCityChange = (selectedCity) => {
-    setFormData({
-      ...formData,
-      city: selectedCity.value
-    });
-  };
-
   const handleApplyCoupon = (e) => {
     e.preventDefault();
     // Simple mock coupon validation - in production, this would call an API
@@ -133,46 +65,26 @@ const RegisterForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure user is authenticated - should already be handled by AuthFlowHandler
-    if (!currentUser) {
-      setError("Please sign in before registering");
-      return; // Exit early - don't start payment process
-    }
-
     setLoading(true);
     setError('');
     setPaymentStep('processing');
 
     try {
-      // Get the current authentication token
-      const idToken = await currentUser.getIdToken(true); // Force refresh to ensure token is valid
-      console.log('ID Token:', idToken);
-
-      // Check if the auth token is actually available
-      if (!idToken) {
-        throw new Error("Unable to authenticate. Please sign in again.");
-      }
-
       // Format the data for registration
       const registrationData = {
         ...formData,
         courseName: 'Phonics English Course',
         courseLevel: 'Beginner',
         courseDuration: '3 months',
-        timestamp: new Date().toISOString(),
-        // Format location data properly for sending to server
-        country: formData.country?.name || '',
-        state: formData.state?.name || '',
-        city: formData.city || ''
+        timestamp: new Date().toISOString()
       };
 
-      // Step 1: Save registration data in RTDB
+      // Step 1: Save registration data in RTDB (now without auth token)
       const registrationResponse = await axios.post(
         `${API_BASE_URL}/api/user/registrations`,
         registrationData,
         {
           headers: {
-            Authorization: `Bearer ${idToken}`,
             'Content-Type': 'application/json'
           }
         }
@@ -182,13 +94,14 @@ const RegisterForm = () => {
         throw new Error(registrationResponse.data.error || 'Failed to save registration data');
       }
 
-      // Step 2: Create payment order with Razorpay
+      // Step 2: Create payment order with Razorpay (no auth required)
       const orderResponse = await axios.post(
         `${API_BASE_URL}/api/create-payment-order`,
         {
+          email: formData.email,
+          discountApplied,
           amount: discountApplied ? 7900 : 9900, // Pass amount explicitly (in paisa)
           currency: "INR",
-          receipt: `receipt_${Date.now()}`,
           notes: {
             courseName: 'Phonics English Course',
             userEmail: formData.email,
@@ -197,7 +110,6 @@ const RegisterForm = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${idToken}`,
             'Content-Type': 'application/json'
           }
         }
@@ -208,7 +120,7 @@ const RegisterForm = () => {
       }
 
       // Get order ID and key from the response
-      const { orderId, razorpayKey } = orderResponse.data;
+      const { orderId, razorpayKey, amount, currency } = orderResponse.data;
 
       // Step 3: Load Razorpay script if not already loaded
       const isScriptLoaded = await loadRazorpayScript();
@@ -220,6 +132,7 @@ const RegisterForm = () => {
       const options = {
         key: razorpayKey,
         amount: discountApplied ? 7900 : 9900, // amount in paisa (99 INR or 79 INR with discount)
+        // amount: 100, // amount in paisa (99 INR or 79 INR with discount)
         currency: "INR",
         name: "Inspiring Shereen",
         description: "Phonics English Course Registration",
@@ -236,9 +149,6 @@ const RegisterForm = () => {
               razorpay_signature: response.razorpay_signature
             };
 
-            // Get a fresh token for verification request
-            const freshToken = await currentUser.getIdToken(true);
-
             // Verify payment with backend - but don't wait for it to complete
             // This prevents delays in showing the success screen
             const verifyPromise = axios.post(
@@ -246,29 +156,34 @@ const RegisterForm = () => {
               paymentData,
               {
                 headers: {
-                  Authorization: `Bearer ${freshToken}`,
                   'Content-Type': 'application/json'
                 }
               }
             );
 
             // Also don't wait for this either - do it in parallel
-            const updatePromise = updateUserRegistration(response.razorpay_order_id, {
-              orderId: response.razorpay_order_id,
-              paymentId: response.razorpay_payment_id,
-              amount: discountApplied ? '₹79' : '₹99',
-              paymentStatus: 'Confirmed',
-              date: new Date().toISOString()
-            });
+            const updatePromise = axios.post(
+              `${API_BASE_URL}/api/update-registration`,
+              {
+                orderId: response.razorpay_order_id,
+                paymentId: response.razorpay_payment_id,
+                email: formData.email,
+                amount: discountApplied ? '₹79' : '₹99',
+                paymentStatus: 'Confirmed',
+                date: new Date().toISOString()
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              }
+            );
 
             // Use the utility function to handle redirection properly
             const userDataToStore = {
               fullName: formData.fullName,
               email: formData.email,
-              phone: formData.phone,
-              country: formData.country?.name || '',
-              state: formData.state?.name || '',
-              city: formData.city || ''
+              phone: formData.phone
             };
 
             // Redirect to success immediately while the operations happen in background
@@ -287,10 +202,7 @@ const RegisterForm = () => {
               const userDataToStore = {
                 fullName: formData.fullName,
                 email: formData.email,
-                phone: formData.phone,
-                country: formData.country?.name || '',
-                state: formData.state?.name || '',
-                city: formData.city || ''
+                phone: formData.phone
               };
               handlePaymentSuccess(response.razorpay_order_id, userDataToStore);
             } catch (redirectError) {
@@ -316,8 +228,7 @@ const RegisterForm = () => {
             // Check if payment was successful despite modal being closed
             setTimeout(async () => {
               try {
-                const idToken = await currentUser.getIdToken(true);
-                const paymentStatus = await checkPaymentStatus(idToken);
+                const paymentStatus = await checkPaymentStatus(formData.email);
 
                 if (paymentStatus.success) {
                   navigate('/success');
@@ -342,15 +253,13 @@ const RegisterForm = () => {
 
       // Log error to server for debugging
       try {
-        const idToken = await currentUser.getIdToken(true);
         await axios.post(`${API_BASE_URL}/api/log-error`, {
           message: err.message,
           stack: err.stack,
-          user: currentUser ? { id: currentUser.uid, email: currentUser.email } : null,
+          user: { email: formData.email },
           context: 'payment_flow'
         }, {
           headers: {
-            Authorization: `Bearer ${idToken}`,
             'Content-Type': 'application/json'
           }
         });
@@ -361,12 +270,11 @@ const RegisterForm = () => {
   };
 
   // Helper function to check payment status
-  const checkPaymentStatus = async (idToken) => {
+  const checkPaymentStatus = async (email) => {
     const response = await axios.get(
-      `${API_BASE_URL}/api/check-payment`,
+      `${API_BASE_URL}/api/check-payment?email=${encodeURIComponent(email)}`,
       {
         headers: {
-          Authorization: `Bearer ${idToken}`,
           'Content-Type': 'application/json'
         }
       }
@@ -421,23 +329,6 @@ const RegisterForm = () => {
               viewport={{ once: true }}
               className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 relative z-10"
             >
-              {/* User status indicator */}
-              {currentUser ? (
-                <div className="mb-6 p-3 bg-green-50 text-green-700 rounded-lg text-sm flex items-center">
-                  <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Signed in as {currentUser.email}
-                </div>
-              ) : (
-                <div className="mb-6 p-3 bg-yellow-50 text-yellow-700 rounded-lg text-sm flex items-center">
-                  <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                  Please sign in to continue with registration
-                </div>
-              )}
-
               {/* Payment step indicators */}
               {paymentStep === 'processing' && !error && (
                 <div className="mb-6 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm flex items-center">
@@ -513,7 +404,6 @@ const RegisterForm = () => {
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                       placeholder="Your email address"
                       required
-                      readOnly={currentUser !== null}
                       disabled={loading}
                     />
                   </div>
@@ -539,119 +429,6 @@ const RegisterForm = () => {
                       disabled={loading}
                     />
                   </div>
-                </div>
-
-                <div className="mb-6">
-                  <label htmlFor="country" className="block text-gray-700 font-medium mb-2">Country</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                    <Select
-                      id="country"
-                      name="country"
-                      options={Country.getAllCountries().map(country => ({
-                        value: country.isoCode,
-                        label: country.name,
-                        ...country
-                      }))}
-                      value={formData.country}
-                      onChange={handleCountryChange}
-                      placeholder="Select Country"
-                      isDisabled={loading}
-                      className="w-full pl-10"
-                      classNamePrefix="select"
-                      isClearable
-                      isSearchable
-                      styles={customStyles}
-                    />
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <label htmlFor="state" className="block text-gray-700 font-medium mb-2">State/Province</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <Select
-                      id="state"
-                      name="state"
-                      options={formData.country
-                        ? State.getStatesOfCountry(formData.country.isoCode).map(state => ({
-                          value: state.isoCode,
-                          label: state.name,
-                          ...state
-                        }))
-                        : []
-                      }
-                      value={formData.state}
-                      onChange={handleStateChange}
-                      placeholder={formData.country ? "Select State/Province" : "Please select a country first"}
-                      isDisabled={!formData.country || loading}
-                      className="w-full pl-10"
-                      classNamePrefix="select"
-                      isClearable
-                      noOptionsMessage={() => formData.country ? "No states/provinces found" : "Select a country first"}
-                      styles={customStyles}
-                    />
-                  </div>
-                  {formData.country && State.getStatesOfCountry(formData.country.isoCode).length === 0 && (
-                    <p className="mt-2 text-xs text-gray-500">
-                      No states/provinces available for the selected country
-                    </p>
-                  )}
-                </div>
-
-                <div className="mb-6">
-                  <label htmlFor="city" className="block text-gray-700 font-medium mb-2">City</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                    </div>
-                    {formData.country && formData.state ? (
-                      <Select
-                        id="city"
-                        name="city"
-                        options={City.getCitiesOfState(formData.country.isoCode, formData.state.isoCode).map(city => ({
-                          value: city.name,
-                          label: city.name
-                        }))}
-                        value={formData.city ? { label: formData.city, value: formData.city } : null}
-                        onChange={handleCityChange}
-                        placeholder="Select City"
-                        isDisabled={!formData.state || loading}
-                        className="w-full pl-10"
-                        classNamePrefix="select"
-                        isClearable
-                        noOptionsMessage={() => "No cities found for this state/province"}
-                        styles={customStyles}
-                      />
-                    ) : (
-                      <input
-                        type="text"
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        placeholder={formData.state ? "Enter city name" : "Please select a state first"}
-                        disabled={!formData.state || loading}
-                      />
-                    )}
-                  </div>
-                  {formData.state && formData.country && City.getCitiesOfState(formData.country.isoCode, formData.state.isoCode).length === 0 && (
-                    <p className="mt-2 text-xs text-gray-500">
-                      No city database available for this state. Please enter your city manually.
-                    </p>
-                  )}
                 </div>
 
                 <div className="mb-8">

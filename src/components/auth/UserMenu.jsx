@@ -20,7 +20,14 @@ const UserMenu = () => {
           const data = await getUserData(currentUser.uid);
           setUserData(data);
         } catch (err) {
-          // Error handling
+          console.warn("Could not fetch complete user data:", err.message);
+          // Still set basic user data from auth object even if RTDB fetch fails
+          setUserData({
+            uid: currentUser.uid,
+            email: currentUser.email,
+            displayName: currentUser.displayName,
+            photoURL: currentUser.photoURL
+          });
         }
       }
     };
@@ -103,7 +110,7 @@ const UserMenu = () => {
             >
               {/* Decorative top bar */}
               <div className="h-1 bg-gradient-to-r from-teal-600 to-blue-600"></div>
-              
+
               <div className="p-4 border-b border-gray-100">
                 <p className="font-medium text-gray-800">{currentUser.displayName || "User"}</p>
                 <p className="text-sm text-gray-500 truncate">{currentUser.email}</p>
@@ -147,9 +154,9 @@ const UserMenu = () => {
       </div>
 
       {/* Auth Modal */}
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </>
   );

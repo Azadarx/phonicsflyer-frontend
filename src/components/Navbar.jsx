@@ -39,7 +39,7 @@ const Navbar = () => {
         }
 
         // Active section detection
-        const sections = ['about', 'courses', 'contact'];
+        const sections = ['about', 'instructors', 'contact'];
         sections.forEach(section => {
           const element = document.getElementById(section);
           if (element) {
@@ -59,13 +59,13 @@ const Navbar = () => {
   // Handle smooth scrolling for hash links
   const handleNavClick = (section) => {
     setIsOpen(false);
-    
+
     if (location.pathname !== '/') {
       // If we're not on the home page, navigate to home and then scroll
       // This is handled elsewhere, so we just return
       return;
     }
-    
+
     // If we're on the home page, scroll to the section
     if (section === 'home') {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -81,12 +81,12 @@ const Navbar = () => {
   // or to a separate page
   const getHref = (item) => {
     if (item === 'home') return '/';
-    
+
     // If we're already on the homepage, use hash links
     if (location.pathname === '/') {
       return `#${item}`;
     }
-    
+
     // Otherwise, return full page links
     return `/${item}`;
   };
@@ -104,10 +104,10 @@ const Navbar = () => {
             <div className="flex-shrink-0 hover:scale-105 transition-transform">
               <Link to="/" className="flex items-center">
                 <span className="text-2xl md:text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-teal-600 to-blue-600">
-                  Inspiring Shereen
+                  ASTA PHONICS FUN
                 </span>
                 <span className="hidden md:block text-gray-700 ml-2 italic">
-                  | AstaEducation
+                  | AstaEducationAcademy
                 </span>
               </Link>
             </div>
@@ -115,7 +115,7 @@ const Navbar = () => {
             {/* Desktop navigation */}
             <div className="hidden sm:flex items-center">
               <div className="flex items-center space-x-6">
-                {['home', 'about', 'courses', 'contact'].map((item) => (
+                {['home', 'about', 'instructors', 'contact'].map((item) => (
                   <Link
                     key={item}
                     to={getHref(item)}
@@ -237,7 +237,7 @@ const Navbar = () => {
               id="mobile-menu"
             >
               <div className="px-6 pt-2 pb-3 space-y-2 bg-white shadow-lg">
-                {['home', 'about', 'courses', 'contact'].map((item) => (
+                {['home', 'about', 'instructors', 'contact'].map((item) => (
                   <Link
                     key={item}
                     to={getHref(item)}

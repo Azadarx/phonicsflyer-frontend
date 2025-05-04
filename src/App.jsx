@@ -15,7 +15,7 @@ import RazorpayPrivacyPolicy from './components/RazorpayPrivacyPolicy';
 import Profile from './components/Profile';
 import AuthFlowHandler from './components/auth/AuthFlowHandler';
 import Instructors from './components/Instructors';
-import Courses from './components/Courses';
+// import Courses from './components/Courses';
 import ScrollToTop from './components/ScrollToTop';
 import Loader from './components/Loader';
 import Contact from './components/contact';
@@ -43,14 +43,14 @@ function App() {
               <About />
               <Features />
               <Instructors />
-              <Courses />
+              {/* <Courses /> */}
               <Pricing />
               <Testimonials />
               <Contact />
               <Footer />
             </div>
           } />
-          {/* Update the register route to use AuthFlowHandler */}
+          {/* Updated register route with no auth check */}
           <Route path="/register" element={
             <>
               <Navbar />
@@ -59,7 +59,8 @@ function App() {
             </>
           } />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/courses" element={<Courses />} />
+          <Route path="/instructors" element={<Instructors />} />
+          {/* <Route path="/courses" element={<Courses />} /> */}
           <Route path="/contact" element={
             <>
               <Navbar />

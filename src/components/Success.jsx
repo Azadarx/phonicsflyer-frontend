@@ -460,7 +460,7 @@ const Success = () => {
                     Our support team is ready to assist you with any questions.
                   </p>
                   <a
-                    href="mailto:phonicswithshereen@gmail.com"
+                    href="mailto:inspiringshereen@gmail.com"
                     className="inline-flex items-center px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg text-sm font-medium transition-colors"
                   >
                     <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">

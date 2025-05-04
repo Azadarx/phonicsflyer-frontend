@@ -1,9 +1,60 @@
 // src/pages/ContactUs.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, BookOpen, MessageCircle, Calendar } from 'lucide-react';
+import { Mail, BookOpen, MessageCircle, Calendar, Send, CheckCircle } from 'lucide-react';
 
 const Contact = () => {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    courseInterest: '',
+    message: ''
+  });
+  const [formStatus, setFormStatus] = useState({
+    submitting: false,
+    submitted: false,
+    error: null
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setFormStatus({ submitting: true, submitted: false, error: null });
+
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to submit form');
+      }
+
+      setFormStatus({ submitting: false, submitted: true, error: null });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        courseInterest: '',
+        message: ''
+      });
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      setFormStatus({ submitting: false, submitted: false, error: error.message });
+    }
+  };
+
   return (
     <div id="contact" className="min-h-screen bg-gradient-to-b from-blue-50 to-teal-100 pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -90,24 +141,18 @@ const Contact = () => {
               >
                 <div>
                   <h3 className="font-bold text-gray-800 mb-4 flex items-center">
-                    <MapPin className="text-teal-600 mr-2" size={20} />
-                    Our Location
+                    <MessageCircle className="text-teal-600 mr-2" size={20} />
+                    Contact Information
                   </h3>
-                  <p className="text-gray-700 pl-4">16-9-610/201, Kala Classic Apartment,</p>
-                  <p className="text-gray-700 pl-4">Agriculture Office Road, Malakpet Colony,</p>
-                  <p className="text-gray-700 pl-4">Telangana, PIN: 500036</p>
+                  <p className="text-gray-700 mb-4">Have questions about our phonics programs? We'd love to help you discover the right learning path for your needs.</p>
                 </div>
                 
                 <div className="mt-6">
-                  <p className="text-gray-700 mb-3 flex items-center">
-                    <Phone className="text-teal-600 mr-2" size={18} />
-                    <span className="font-medium">Phone:</span> 9494100110
-                  </p>
                   <p className="text-gray-700 flex items-center">
                     <Mail className="text-teal-600 mr-2" size={18} />
                     <span className="font-medium">Email:</span> 
-                    <a href="mailto:phonicswithshereen@gmail.com" className="text-teal-600 ml-1 hover:text-teal-800 transition-colors">
-                      phonicswithshereen@gmail.com
+                    <a href="mailto:inspiringshereen@gmail.com" className="text-teal-600 ml-1 hover:text-teal-800 transition-colors">
+                      inspiringshereen@gmail.com
                     </a>
                   </p>
                 </div>
@@ -169,61 +214,107 @@ const Contact = () => {
               className="mt-12"
             >
               <h3 className="text-xl font-bold text-gray-800 mb-6">Inquire About Our Programs</h3>
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Your Name</label>
-                  <input 
-                    type="text" 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Email Address</label>
-                  <input 
-                    type="email" 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
-                    placeholder="Enter your email"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Phone Number</label>
-                  <input 
-                    type="tel" 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
-                    placeholder="Enter your phone number"
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2 font-medium">Course Interest</label>
-                  <select 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
-                  >
-                    <option value="">Select a program</option>
-                    <option value="beginner">Beginner Phonics</option>
-                    <option value="advanced">Advanced Pronunciation</option>
-                    <option value="professional">Professional Speaking</option>
-                    <option value="custom">Custom Learning Plan</option>
-                  </select>
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-gray-700 mb-2 font-medium">Your Message</label>
-                  <textarea 
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition h-32" 
-                    placeholder="Tell us about your learning goals or any specific questions"
-                  ></textarea>
-                </div>
-                <div className="md:col-span-2">
-                  <motion.button
-                    whileHover={{ scale: 1.03 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="bg-gradient-to-r from-teal-600 to-blue-600 text-gray-800 font-medium px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all"
-                    type="submit"
-                  >
-                    Submit Inquiry
-                  </motion.button>
-                </div>
-              </form>
+              
+              {formStatus.submitted ? (
+                <motion.div 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="bg-green-50 border border-green-200 rounded-lg p-6 text-center"
+                >
+                  <CheckCircle className="text-green-500 mx-auto mb-4" size={48} />
+                  <h4 className="text-xl font-bold text-green-700 mb-2">Thank You!</h4>
+                  <p className="text-gray-700">Your message has been sent successfully. We'll get back to you shortly.</p>
+                </motion.div>
+              ) : (
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Your Name</label>
+                    <input 
+                      type="text" 
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
+                      placeholder="Enter your name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Email Address</label>
+                    <input 
+                      type="email" 
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
+                      placeholder="Enter your email"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Phone Number</label>
+                    <input 
+                      type="tel" 
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition" 
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  {/* <div>
+                    <label className="block text-gray-700 mb-2 font-medium">Course Interest</label>
+                    <select 
+                      name="courseInterest"
+                      value={formData.courseInterest}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
+                      required
+                    >
+                      <option value="">Select a program</option>
+                      <option value="beginner">Beginner Phonics</option>
+                      <option value="advanced">Advanced Pronunciation</option>
+                      <option value="professional">Professional Speaking</option>
+                      <option value="custom">Custom Learning Plan</option>
+                    </select>
+                  </div> */}
+                  <div className="md:col-span-2">
+                    <label className="block text-gray-700 mb-2 font-medium">Your Message</label>
+                    <textarea 
+                      name="message"
+                      value={formData.message}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition h-32" 
+                      placeholder="Tell us about your learning goals or any specific questions"
+                      required
+                    ></textarea>
+                  </div>
+                  
+                  {formStatus.error && (
+                    <div className="md:col-span-2 text-red-600 bg-red-50 p-3 rounded-lg">
+                      <p>Error: {formStatus.error}</p>
+                    </div>
+                  )}
+                  
+                  <div className="md:col-span-2">
+                    <motion.button
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.98 }}
+                      className="bg-gradient-to-r from-teal-600 to-blue-600 text-white font-medium px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center"
+                      type="submit"
+                      disabled={formStatus.submitting}
+                    >
+                      {formStatus.submitting ? (
+                        <>Processing...</>
+                      ) : (
+                        <>
+                          Submit Inquiry <Send className="ml-2" size={18} />
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </form>
+              )}
             </motion.div>
           </div>
         </motion.div>
