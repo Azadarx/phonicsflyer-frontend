@@ -99,7 +99,7 @@ const About = () => {
           {/* Right side - Content */}
           <motion.div variants={containerVariants} initial="hidden" animate={controls} className="order-2 lg:order-none">
             <motion.h3 variants={itemVariants} className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-4 sm:mb-5 md:mb-6">
-              Meet Your Coach: Miss Shereen
+              Meet Your Coach: Mrs. Shereen
             </motion.h3>
 
             <motion.p variants={itemVariants} className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-5 md:mb-6">
