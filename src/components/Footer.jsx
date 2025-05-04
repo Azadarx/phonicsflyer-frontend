@@ -199,7 +199,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="mt-16 pt-8 border-t border-white/10 text-center">
           <p className="text-gray-400">
-            © {currentYear} Asta Education Academy. All rights reserved.
+            © {currentYear} ASTA PHONICS FUNS. All rights reserved.
           </p>
         </div>
       </div>
