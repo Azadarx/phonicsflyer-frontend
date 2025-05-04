@@ -132,7 +132,6 @@ const RegisterForm = () => {
       const options = {
         key: razorpayKey,
         amount: discountApplied ? 7900 : 9900, // amount in paisa (99 INR or 79 INR with discount)
-        // amount: 100, // amount in paisa (99 INR or 79 INR with discount)
         currency: "INR",
         name: "Inspiring Shereen",
         description: "Phonics English Course Registration",
@@ -294,22 +293,22 @@ const RegisterForm = () => {
         }}
       />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Column - Form */}
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex justify-center">
+          {/* Centered Form */}
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="lg:w-2/3"
+            className="w-full max-w-md"
           >
             <div className="text-center mb-8">
               <div className="inline-block px-4 py-1.5 bg-blue-100 rounded-full mb-4">
                 <span className="text-blue-700 font-semibold">Limited Time Offer</span>
               </div>
 
-              <h2 className="text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-600 mb-4">
+              <h2 className="text-3xl sm:text-4xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-600 mb-4">
                 Join Our Phonics English Course
               </h2>
 
@@ -317,7 +316,7 @@ const RegisterForm = () => {
                 <div className="w-24 h-1.5 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-full mb-6"></div>
               </div>
 
-              <p className="text-lg text-gray-700 mb-4 max-w-md mx-auto">
+              <p className="text-base sm:text-lg text-gray-700 mb-4 max-w-md mx-auto">
                 Master English pronunciation with our comprehensive phonics approach for learners of all ages
               </p>
             </div>
@@ -327,7 +326,7 @@ const RegisterForm = () => {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 relative z-10"
+              className="bg-white rounded-2xl shadow-xl p-5 sm:p-8 border border-blue-100 relative z-10"
             >
               {/* Payment step indicators */}
               {paymentStep === 'processing' && !error && (
@@ -431,44 +430,6 @@ const RegisterForm = () => {
                   </div>
                 </div>
 
-                {/* <div className="mb-8">
-                  <label htmlFor="couponCode" className="block text-gray-700 font-medium mb-2">Coupon Code</label>
-                  <div className="flex">
-                    <div className="relative flex-grow">
-                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                        </svg>
-                      </div>
-                      <input
-                        type="text"
-                        id="couponCode"
-                        name="couponCode"
-                        value={formData.couponCode}
-                        onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
-                        placeholder="Enter coupon code if you have one"
-                        disabled={loading || discountApplied}
-                      />
-                    </div>
-                    <button
-                      onClick={handleApplyCoupon}
-                      disabled={!formData.couponCode || loading || discountApplied}
-                      className="ml-2 px-4 py-3 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                      type="button"
-                    >
-                      Apply
-                    </button>
-                  </div>
-                  {discountApplied && (
-                    <p className="mt-2 text-sm text-green-600 flex items-center">
-                      <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Coupon applied! 20% discount activated.
-                    </p>
-                  )}
-                </div> */}
                 {error && (
                   <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
                     {error}
@@ -515,126 +476,6 @@ const RegisterForm = () => {
                 </p>
               </form>
             </motion.div>
-          </motion.div>
-
-          {/* Right Column - Course Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:w-1/3"
-          >
-            {/* <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 sticky top-6">
-              <h3 className="text-xl font-bold text-blue-800 mb-6">Course Summary</h3>
-
-              <div className="space-y-4 mb-6">
-                <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                  <span className="text-gray-600">Course</span>
-                  <span className="font-medium">Phonics English Course</span>
-                </div>
-
-                <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                  <span className="text-gray-600">Level</span>
-                  <span className="font-medium">Beginner</span>
-                </div>
-
-                <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                  <span className="text-gray-600">Duration</span>
-                  <span className="font-medium">3 months</span>
-                </div>
-
-                <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                  <span className="text-gray-600">Original Price</span>
-                  <span className="font-medium">₹99</span>
-                </div>
-
-                {discountApplied && (
-                  <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                    <span className="text-green-600">Discount</span>
-                    <span className="font-medium text-green-600">20% OFF</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between items-center pt-2">
-                  <span className="text-lg font-bold text-gray-800">Total Price</span>
-                  <span className="text-xl font-bold text-blue-700">
-                    ₹{discountApplied ? '79' : '99'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="space-y-5 mt-8">
-                <h4 className="font-bold text-gray-800">Why Choose Our Phonics English Course?</h4>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h5 className="text-sm font-medium text-gray-800">Expert Instructors</h5>
-                    <p className="text-xs text-gray-500">Learn from certified specialists with years of teaching experience.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h5 className="text-sm font-medium text-gray-800">Interactive Learning</h5>
-                    <p className="text-xs text-gray-500">Engage with fun activities, games, and exercises designed to make learning enjoyable.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h5 className="text-sm font-medium text-gray-800">Rapid Progress</h5>
-                    <p className="text-xs text-gray-500">Our proven method helps students improve their skills fast.</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start">
-                  <div className="flex-shrink-0 bg-blue-100 rounded-full p-2">
-                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h5 className="text-sm font-medium text-gray-800">Certificate Included</h5>
-                    <p className="text-xs text-gray-500">Receive a verified certificate upon course completion.</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-100">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                        SJ
-                      </div>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-gray-600 italic">
-                        "I've shown remarkable improvement in my English skills since joining this course. The interactive approach keeps me engaged and excited about learning. Highly recommended!"
-                      </p>
-                      <p className="text-xs font-medium text-gray-700 mt-2">Sarah Johnson</p>
-                      <p className="text-xs text-gray-500">Student</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
           </motion.div>
         </div>
       </div>
