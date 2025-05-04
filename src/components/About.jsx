@@ -210,8 +210,9 @@ const About = () => {
           variants={itemVariants}
           className="mt-10 sm:mt-12 md:mt-14 lg:mt-16 text-center"
         >
-          <a href="https://asta-frontend-quickjoins-projects.vercel.app/" target="_blank" rel="noopener noreferrer">
+          {/* <a href="https://asta-frontend-quickjoins-projects.vercel.app/" rel="noopener noreferrer"> */}
             <motion.button
+              onAbort={() => window.location.href = "/register"}
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 10px 30px -10px rgba(13, 148, 136, 0.5)"
@@ -226,7 +227,7 @@ const About = () => {
                 </svg>
               </span>
             </motion.button>
-          </a>
+          {/* </a> */}
         </motion.div>
       </div>
     </section>

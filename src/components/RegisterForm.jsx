@@ -431,7 +431,7 @@ const RegisterForm = () => {
                   </div>
                 </div>
 
-                <div className="mb-8">
+                {/* <div className="mb-8">
                   <label htmlFor="couponCode" className="block text-gray-700 font-medium mb-2">Coupon Code</label>
                   <div className="flex">
                     <div className="relative flex-grow">
@@ -468,7 +468,7 @@ const RegisterForm = () => {
                       Coupon applied! 20% discount activated.
                     </p>
                   )}
-                </div>
+                </div> */}
                 {error && (
                   <div className="mb-6 p-3 bg-red-50 text-red-600 rounded-lg text-sm">
                     {error}
@@ -525,7 +525,7 @@ const RegisterForm = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="lg:w-1/3"
           >
-            <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 sticky top-6">
+            {/* <div className="bg-white rounded-2xl shadow-xl p-8 border border-blue-100 sticky top-6">
               <h3 className="text-xl font-bold text-blue-800 mb-6">Course Summary</h3>
 
               <div className="space-y-4 mb-6">
@@ -634,7 +634,7 @@ const RegisterForm = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </motion.div>
         </div>
       </div>
