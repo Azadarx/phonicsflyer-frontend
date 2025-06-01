@@ -1,6 +1,7 @@
 // src/components/About.jsx
 import React, { useEffect, useRef } from 'react';
 import { motion, useInView, useAnimation } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 const About = () => {
   const controls = useAnimation();
@@ -211,8 +212,8 @@ const About = () => {
           className="mt-10 sm:mt-12 md:mt-14 lg:mt-16 text-center"
         >
           {/* <a href="https://asta-frontend-quickjoins-projects.vercel.app/" rel="noopener noreferrer"> */}
+            <Link to="/register">
             <motion.button
-              onAbort={() => window.location.href = "/register"}
               whileHover={{
                 scale: 1.05,
                 boxShadow: "0 10px 30px -10px rgba(13, 148, 136, 0.5)"
@@ -226,7 +227,7 @@ const About = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
               </span>
-            </motion.button>
+            </motion.button></Link>
           {/* </a> */}
         </motion.div>
       </div>
